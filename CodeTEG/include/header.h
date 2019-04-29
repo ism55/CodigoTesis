@@ -1,0 +1,162 @@
+#include "stdlib.h"
+
+
+#include "osapi.h"
+#include "user_interface.h"
+#include "driver/uart.h"
+#include "ets_sys.h"
+#include "c_types.h"
+#include "espconn.h"
+#include "mem.h"
+#include "gpio.h"
+#include "eagle_soc.h"
+
+LOCAL struct espconn user_tcp_espconn;
+LOCAL struct _esp_tcp user_tcp;
+
+//int cmd1_flag,cmd2_flag;
+const char *inicio1="\xf1\x00\xc0\xf2\x0b\xc0\xf3\xf4\x40\xf4\x0e\xcc\xf5\x0e\xcc\xf6\x0e\xcc";
+
+uint8 inicio11[18]={241,0,192,242,11,192,243,244,64,244,15,204,245,15,204,246,14,204};
+uint8 inicio111[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC};
+const char *inicio2="\xf1\x00\x00\xf2\x18\x40\xf3\xde\x00\xf4\x16\x32\xf5\x16\x32\xf6\x16\x32";
+//char *buff;
+char cadena[20];
+//char *puntero;
+uint8 inicio22[18]={241,0,0,242,24,64,243,222,0,244,22,50,245,22,50,246,22,50};
+
+struct softap_config config;
+struct station_config station_cfg;
+
+
+char sta_ssid[]="";
+char sta_pass[]="";
+
+const char *pagina2=
+"HTTP/1.1 200 OK\r\n\r\n"
+"<!DOCTYPE html>"
+"<html>"
+"<head>"
+"<title>TEG</title>"
+"<style>"
+"\n*{\nmargin: 0;\npadding: 0;\n}"
+"\n#Superior{"
+"\nbackground-color: #E6E6E6;"
+"\n}"
+"\n#Pagina{"
+"\nmargin: 0 auto;"
+"\nborder: 1px solid #9900CC;"
+"\nheight: 85\x25;"
+"\n}"
+"\n#ncabezado{"
+"height: 50px;"
+"\nbackground-color: #FF3300;"
+"\n}"
+"\n#LaIzquierda{"
+"\nwidth: 20\x25;"
+"\nheight: 500px;"
+"\nfloat: left;"
+"\nbackground-color: #0066FF;"
+"\n}"
+"\n#Principal{"
+"\nwidth: 60\x25;"
+"\nfloat: left;"
+"\nbackground-color: #FFFFFF;"
+"\n}"
+"\n#LaDerecha{"
+"\nwidth: 20\x25;"
+"\nheight: 500px;"
+"\nfloat: right;"
+"\nbackground-color: #006600;"
+"\n}"
+"\n#piePagina{"
+"\nclear: both;"
+"\nheight: 25px;"
+"\nbackground-color: #CC6699;"
+"\n}"
+"\n</style>"
+"\n<script>"
+//"\nfunction myFunction() {"
+//"\nvar slider = document.getElementById(\x22slider\x22);"
+//"\nvar a = 0;"
+//"\nsetInterval(function() {"
+                          //"\na = slider.value;"
+                          //"\nispDiv.innerHTML = \x22Valor= \x22 + a;"
+                          //"\n//get(\x22 192.168.4.1:8266/\x22+a);"
+                          //"\n}, 270)"
+//"\n}"
+/*
+"\nvar slider = document.getElementById(\x22servoSlider\x22);"
+   "\nvar servoP = document.getElementById(\x22servoPos\x22);"
+
+
+   "\nservoP.innerHTML = slider.value;"
+   "\nslider.oninput = function() {"
+     "\nslider.value = this.value;"
+     "\nservoP.innerHTML = this.value;"
+   "\n}"*/
+   "\n$.ajaxSetup({timeout:3600000});"
+//"setInterval(servo,100);"
+   "\nfunction mover(pos,nombre) {"
+     "\n$.get(\x22?\x22+nombre+\x22=\x22 + pos);"
+     "\nsetTimeout(function(){$.get(\x22?\x22+nombre+\x22=\x22 + pos);},10);"
+     "\n{Connection: close};"
+   "\n}"
+
+"</script>"
+ "<script src=\x22https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\x22></script>"
+"</head>"
+"<body>"
+"<div id=\x22Superior\x22>"
+"<h1>TRABAJO ESPECIAL DE GRADO</h1>"
+"</div>"
+"<div id=\x22Pagina\x22>"
+"<header id=\x22ncabezado\x22>"
+"<p>#ncabezado</p>"
+"</header>"
+"<aside id=\x22LaIzquierda\x22><p>#LaIzquierda</p></aside>"
+"<section id=\x22Principal\x22>"
+"<p>#Principal</p>\n<p>LED:"
+"<a href=\x22?pin=ON1\x22><button>ON</button></a>"
+"<a href=\x22?pin=OFF1\x22><button>OFF</button></a>"
+"<a href=\x22?inicio1\x22><button>INICIAR1</button></a>"
+"<a href=\x22?inicio2\x22><button>INICIAR2</button></a></p>"
+"<form onsubmit=\x22return false\x22>\n"
+"<input type=\x22number\x22 name=\x22num\x22>"
+"<input type=\x22submit\x22 value=\x22subir\x22>"
+"</form>"
+"<form onsubmit=\x22return false\x22>\n"
+"<input type=\x22number\x22 name=\x22xF1\x22 >"
+"<input type=\x22submit\x22 value=\x22xF1\x22 onclick=\x22this.form.num1.value=this.form.xF1.value; mover(this.form.num1.value,this.form.xF1.name)\x22>"
+"<input type=\x22range\x22 name=\x22num1\x22 min=\x22-135\x22 max=\x22 135\x22 oninput=\x22mover(this.value,this.name)\x22 onchange=\x22mover(this.value,this.name)\x22 step=\x22 10\x22 id=\x22slider\x22>"
+"</form>"
+"<form >\n"
+"<input type=\x22number\x22 name=\x22xF2\x22>"
+"<input type=\x22submit\x22 value=\x22xF2\x22>"
+"</form>"
+"<form >\n"
+"<input type=\x22number\x22 name=\x22xF3\x22>"
+"<input type=\x22submit\x22 value=\x22xF3\x22>"
+"</form>"
+"<form >\n"
+"<input type=\x22number\x22 name=\x22xF4\x22>"
+"<input type=\x22submit\x22 value=\x22xF4\x22>"
+"</form>"
+"<form >\n"
+"<input type=\x22number\x22 name=\x22xF5\x22>"
+"<input type=\x22submit\x22 value=\x22xF5\x22>"
+"</form>"
+"<form >\n"
+"<input type=\x22number\x22 name=\x22xF6\x22>"
+"<input type=\x22submit\x22 value=\x22xF6\x22>"
+"</form>"
+//"<form method=\x22GET\x22>"
+//"<input type=\x22range\x22 min=\x22-135\x22 max=\x22 135\x22 id=\x22servoSlider\x22 oninput=\x22servo(this.value)\x22 step=\x22 10\x22>"
+//"<div id=\x22ispDiv\x22></div>"
+//"</form>"
+"</section>"
+"<aside id=\x22LaDerecha\x22><p>#LaDerecha</p></aside>"
+"<footer id=\x22piePagina\x22><p>#piePagina</p></footer>"
+"</div>"
+"</body>"
+"</html>";
