@@ -1,14 +1,4 @@
-
-//#include "os_type.h"
-
-//#include "user_iot_version.h"
-//#include "user_json.h"
-//#include "user_webserver.h"
-//#include "upgrade.h"
-
 #include <header.h>
-//int MyAtoi(uint8_t *str);
-
 
 uint32 ICACHE_FLASH_ATTR
 user_rf_cal_sector_set(void)
@@ -48,25 +38,6 @@ user_rf_pre_init(void)
 {
 }
 
-/*
-int MyAtoi(uint8_t *str){
-  int res=0;
-  int sign=1;
-  int i=0;
-
-
-
-  if (str[0]=='-'){
-    sign=-1;
-    i++;
-  }
-
-  for(; str[i]!='\0';i++){
-    res=res*10+str[i]-'0';
-  }
-  return sign*res;
-}
-*/
 
 /*Funcion de respuesta ante recepción de información
 incluye mostrar por uart lo recibido y devolver un
@@ -89,28 +60,19 @@ os_printf(cadena);
 */
 if (cmd1==0){
   os_printf("LED ENCENDIDO!!!\r\n");
-//cmd1_flag=1;
-
-GPIO_OUTPUT_SET(GPIO_ID_PIN(2), 0);
-//uart0_sendStr("LED ENCENDIDO!!!\r\n");
+  GPIO_OUTPUT_SET(GPIO_ID_PIN(2), 0);
 }
 
 if(cmd2==0){
   os_printf("LED APAGADO!!!\r\n");
-//  cmd1_flag=0;
-GPIO_OUTPUT_SET(GPIO_ID_PIN(2), 1);
-//uart0_sendStr("LED APAGADO!!!\r\n");
+  GPIO_OUTPUT_SET(GPIO_ID_PIN(2), 1);
 }
 
 if(cmd3==0){
-//  cmd1_flag=0;
-//uart0_sendStr("\xf1\x01\xc0\xf2\x0b\xc0\xf3\xf4\x40\xf4\x0e\xcc\xf5\x0e\xcc\xf6\x0e\xcc");
 uart0_tx_buffer(inicio11,sizeof(inicio11));
 }
 
 if(cmd4==0){
-//  cmd1_flag=0;
-//uart0_sendStr("\xf1\x01\x01\xf2\x18\x40\xf3\xde\x01\xf4\x16\x32\xf5\x16\x32\xf6\x16\x32");
 uart0_tx_buffer(inicio111,sizeof(inicio111));
 }
 
@@ -127,7 +89,7 @@ if(cmd5==0){
   token=strtok(NULL," =");
   strcpy(word1,token);
 
-/*
+/*////Convertir char a uint8
   int l = strlen(word1) + 1;
   uint8_t msg2[l];
   size_t i = 0;
