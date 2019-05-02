@@ -14,16 +14,8 @@
 LOCAL struct espconn user_tcp_espconn;
 LOCAL struct _esp_tcp user_tcp;
 
-//int cmd1_flag,cmd2_flag;
-const char *inicio1="\xf1\x00\xc0\xf2\x0b\xc0\xf3\xf4\x40\xf4\x0e\xcc\xf5\x0e\xcc\xf6\x0e\xcc";
-
-uint8 inicio11[18]={241,0,192,242,11,192,243,244,64,244,15,204,245,15,204,246,14,204};
-uint8 inicio111[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC};
-const char *inicio2="\xf1\x00\x00\xf2\x18\x40\xf3\xde\x00\xf4\x16\x32\xf5\x16\x32\xf6\x16\x32";
-//char *buff;
 char cadena[20];
-//char *puntero;
-uint8 inicio22[18]={241,0,0,242,24,64,243,222,0,244,22,50,245,22,50,246,22,50};
+float constante_grados=0.33;
 
 struct softap_config config;
 struct station_config station_cfg;
@@ -178,41 +170,11 @@ const char *pagina2=
     "\nfont-size: 1.5em;"
 "\n}"
 "\n</style>"
-"\n<script src=\x22https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\x22></script>"
-"\n<script>"
-"$.ajaxSetup({timeout: 3600000});"
-
-"function mover(pos, nombre) {"
-    //$.get("?" + nombre + "=" + pos);
-    "setTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);"
-"}"
-
-"function pinza(state){"
-    "var gripon='gripon';"
-    "var gripoff='gripoff';"
-    "if(state=='ON'){"
-       "mover("",gripon);"
-       "}else if(state=='OFF'){"
-           "mover('',gripoff);"
-       "}"
-
-"}"
-
-//<!--hide
-"var pass;"
-"var exito='ROBOCOM';"
-
-"pass=prompt('Introduzca la clave para entrar');"
-"if(pass==exito){"
-    "alert('Clave exitosa! Haga clic para entrar');"
-"} else{"
-    "alert('Clave incorrecta! Haga clic para ir a Google');"
-    "window.location='www.google.com';"
-"}"
-//-->
-"</script>"
-"</head>"
+    "\n<script src='http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>"
+"\n</head>"
 "<body>"
+
+
         "<header>"
             "<div class='contenedor'>"
                "<h1 class='titulo'>TRABAJO ESPECIAL DE GRADO</h1>"
@@ -375,5 +337,38 @@ const char *pagina2=
             "</div>"
         "</section>"
     "</main>"
+
+    "\n<script>"
+    "\n$.ajaxSetup({timeout: 3600000});"
+
+    "\nfunction mover(pos, nombre) {"
+        //$.get("?" + nombre + "=" + pos);
+        "\nsetTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);"
+    "\n}"
+
+    "\nfunction pinza(state){"
+        "\nvar gripon='gripon';"
+        "\nvar gripoff='gripoff';"
+        "\nif(state=='ON'){"
+           "\nmover('=',gripon);"
+           "\n}else if(state=='OFF'){"
+               "\nmover('=',gripoff);"
+           "\n}"
+
+    "\n}"
+
+"var pass;"
+"var exito='ROBOCOM';"
+
+"pass=prompt('Introduzca la clave para entrar');"
+
+"if(pass==exito){"
+    "alert('Clave exitosa! Haga clic para entrar');"
+"} else{"
+    "alert('Clave incorrecta! Haga clic para ir a Google');"
+    "window.location='http://www.google.com';"
+"}"
+
+    "\n</script>"
 "</body>"
 "</html>";
