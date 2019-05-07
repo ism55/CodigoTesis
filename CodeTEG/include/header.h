@@ -61,16 +61,12 @@ const char *pagina2=
 
 "\nh1 {"
     "\nfloat: left;"
-    "\nfont-size: 2em;"
+    "\nfont-size: 1em;"
+    "\npadding: 10px;"
 "\n}"
 
 "\nheader .contenedor{"
     "\ndisplay: table;"
-"\n}"
-
-"\nsection{"
-    "\nwidth:100\x25;"
-    "\nmargin-bottom: 25px;"
 "\n}"
 
 
@@ -82,20 +78,18 @@ const char *pagina2=
 "\n#movimiento{"
     "\ntext-align: center;"
     "\nbackground-color:#222;"
-    "\nheight: 8\x25;"
+    "\nheight: 70em;"
 "\n}"
 
 "\n#movimiento h3{"
     "\ncolor:#fff;"
     "\npadding:20px;"
 "\n}"
-"\ndiv #configuracion{"
 
-"\n}"
 
 "\n#laizquierda{"
     "\nwidth:49\x25;"
-    "\nheight: 300px;"
+    "\nheight: 60em;"
     "\nfloat: left;"
     "\nbackground-color: lightgrey;"
 "\n}"
@@ -103,10 +97,14 @@ const char *pagina2=
 
 "\n#laderecha{"
     "\nwidth:49\x25;"
-    "\nheight: 300px;"
+    "\nheight: 60em;"
     "\nfloat: right;"
     "\nbackground-color: lightslategrey;"
 "\n}"
+
+input[type='text']{
+    width: 55px;
+}
 
 "\ninput[type='number']{"
     "\nwidth: 55px;"
@@ -133,9 +131,6 @@ const char *pagina2=
     "\nbackground: #00bcd4;"
 "\n}"
 
-"\nsection article form{"
-    "\nposition: relative;"
-"\n}"
 
 "\ninput{"
     "\nmargin: 20px 0px 0px 0px;"
@@ -147,10 +142,29 @@ const char *pagina2=
     "\ntext-align: center;"
     "\ncolor: #fff;"
 "\n}"
+
+.labelconf{
+    margin: 40px 0px 0px 20px;
+    text-align: center;
+    color: #000;
+    font-weight: bold;
+
+}
+
+div #wifi{
+    height: 8%;
+    background-color:#444;
+    color: #fff;
+    padding: 10px;
+
+}
+
 "\n#banner{"
     "\nmargin-top: 50px;"
     "\nposition: relative;"
 "\n}"
+
+
 
 "\n#banner img{"
     "\nwidth: 100\x25;"
@@ -360,15 +374,25 @@ const char *pagina2=
 "var pass;"
 "var exito='ROBOCOM';"
 
-"pass=prompt('Introduzca la clave para entrar');"
+"\npass=prompt('Introduzca la clave para entrar');"
 
-"if(pass==exito){"
-    "alert('Clave exitosa! Haga clic para entrar');"
-"} else{"
-    "alert('Clave incorrecta! Haga clic para ir a Google');"
-    "window.location='http://www.google.com';"
+"\nif(pass==exito){"
+    "\nalert('Clave exitosa! Haga clic para entrar');"
+"\n} else{"
+    "\nalert('Clave incorrecta! Haga clic para ir a Google');"
+    "\nwindow.location='http://www.google.com';"
 "}"
+"function chequear(formulario){"
+    "\nvar state;"
+    "\nvar that=formulario;"
+    "\nif(that.checked){"
+        "\nstate='ON';"
+  "\n}else{"
+        "\nstate='OFF';"
+    "}"
 
+    "\nmover(state,that.name);"
+"}"
     "\n</script>"
 "</body>"
 "</html>";

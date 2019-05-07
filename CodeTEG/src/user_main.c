@@ -55,9 +55,11 @@ int cmd6=os_strncmp(pdata,"GET /?num6",strlen("GET /?num6"));
 int cmd7=os_strncmp(pdata,"GET /?gripon",strlen("GET /?gripon"));
 int cmd8=os_strncmp(pdata,"GET /?gripoff",strlen("GET /?gripoff"));
 
+/*
 os_strncpy(cadena,pdata,16);
 cadena[16]='\0';
 os_printf(cadena);
+*/
 
 /******************************************************************************
 
@@ -203,7 +205,7 @@ if(cmd5==0){
 
   uart0_tx_buffer(msg2,sizeof(msg2));
 
-  os_printf("USANDO ATOI: %d\r\n",numero2);
+  //os_printf("USANDO ATOI: %d\r\n",numero2);
 
 }
 
@@ -224,6 +226,7 @@ if(cmd6==0){
   int valorlow=(numero2);
   uint8 msg2[]={0xF6,valorhigh,valorlow};
   uart0_tx_buffer(msg2,sizeof(msg2));
+
 
 }
 
