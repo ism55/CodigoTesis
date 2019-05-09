@@ -52,8 +52,42 @@ int cmd3=os_strncmp(pdata,"GET /?num3",strlen("GET /?num3"));
 int cmd4=os_strncmp(pdata,"GET /?num4",strlen("GET /?num4"));
 int cmd5=os_strncmp(pdata,"GET /?num5",strlen("GET /?num5"));
 int cmd6=os_strncmp(pdata,"GET /?num6",strlen("GET /?num6"));
+
 int cmd7=os_strncmp(pdata,"GET /?gripon",strlen("GET /?gripon"));
 int cmd8=os_strncmp(pdata,"GET /?gripoff",strlen("GET /?gripoff"));
+
+int cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid"));
+int cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password"));
+
+int cmd11=os_strncmp(pdata,"GET /?Kp1",strlen("GET /?Kp1"));
+int cmd12=os_strncmp(pdata,"GET /?Ki1",strlen("GET /?Ki1"));
+int cmd13=os_strncmp(pdata,"GET /?Kd1",strlen("GET /?Kd1"));
+
+int cmd14=os_strncmp(pdata,"GET /?Kp2",strlen("GET /?Kp2"));
+int cmd15=os_strncmp(pdata,"GET /?Ki2",strlen("GET /?Ki2"));
+int cmd16=os_strncmp(pdata,"GET /?Kd2",strlen("GET /?Kd2"));
+
+int cmd17=os_strncmp(pdata,"GET /?Kp3",strlen("GET /?Kp3"));
+int cmd18=os_strncmp(pdata,"GET /?Ki3",strlen("GET /?Ki3"));
+int cmd19=os_strncmp(pdata,"GET /?Kd3",strlen("GET /?Kd3"));
+
+int cmd20=os_strncmp(pdata,"GET /?Kpro1",strlen("GET /?Kpro1"));
+int cmd21=os_strncmp(pdata,"GET /?Koffset1",strlen("GET /?Koffset1"));
+
+int cmd22=os_strncmp(pdata,"GET /?Kpro2",strlen("GET /?Kpro2"));
+int cmd23=os_strncmp(pdata,"GET /?Koffset2",strlen("GET /?Koffset2"));
+
+int cmd24=os_strncmp(pdata,"GET /?Kpro3",strlen("GET /?Kpro3"));
+int cmd25=os_strncmp(pdata,"GET /?Koffset3",strlen("GET /?Koffset3"));
+
+int cmd26=os_strncmp(pdata,"GET /?puente1=ON",strlen("GET /?puente1=ON"));
+int cmd27=os_strncmp(pdata,"GET /?puente1=OFF",strlen("GET /?puente1=OFF"));
+
+int cmd28=os_strncmp(pdata,"GET /?puente2=ON",strlen("GET /?puente2=ON"));
+int cmd29=os_strncmp(pdata,"GET /?puente2=OFF",strlen("GET /?puente2=OFF"));
+
+int cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON"));
+int cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
 /*
 os_strncpy(cadena,pdata,16);
@@ -241,6 +275,28 @@ if(cmd7==0){
   uart0_tx_buffer(msg2,sizeof(msg2));
 
 }
+
+if(cmd9==0){
+
+  char word1[20];
+  int numero;
+  os_strncpy(cadena,pdata,16);
+  cadena[16]='\0';
+  char *token=strtok((char *)cadena," =");
+  token=strtok(NULL," =");
+  token=strtok(NULL," =");
+  strcpy(word1,token);
+  int numero2=atoi(word1);
+  numero2=numero2/constante_grados;
+  numero2=numero2<<6;
+  int valorhigh=(numero2>>8);
+  int valorlow=(numero2);
+  uint8 msg2[]={0xF6,valorhigh,valorlow};
+  uart0_tx_buffer(msg2,sizeof(msg2));
+
+}
+
+
 
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
   //espconn_sent((struct espconn *) arg, "Informacion recibida\r\n", strlen("Información recibida\r\n"));
