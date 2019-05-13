@@ -89,6 +89,8 @@ int cmd29=os_strncmp(pdata,"GET /?puente2=OFF",strlen("GET /?puente2=OFF"));
 int cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON"));
 int cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
+int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
+
 /*
 os_strncpy(cadena,pdata,16);
 cadena[16]='\0';
@@ -277,25 +279,85 @@ if(cmd7==0){
 }
 
 if(cmd9==0){
-
   char word1[20];
-  int numero;
   os_strncpy(cadena,pdata,16);
   cadena[16]='\0';
   char *token=strtok((char *)cadena," =");
+  os_printf("%s\r\n",token);
   token=strtok(NULL," =");
   token=strtok(NULL," =");
+  os_printf("%s\r\n",token);
   strcpy(word1,token);
-  int numero2=atoi(word1);
-  numero2=numero2/constante_grados;
-  numero2=numero2<<6;
-  int valorhigh=(numero2>>8);
-  int valorlow=(numero2);
-  uint8 msg2[]={0xF6,valorhigh,valorlow};
-  uart0_tx_buffer(msg2,sizeof(msg2));
-
+  strcpy(sta_ssid,word1);
 }
 
+if(cmd10==0){
+  char word1[20];
+  os_strncpy(cadena,pdata,16);
+  cadena[16]='\0';
+  char *token=strtok((char *)cadena," =");
+  os_printf("%s\r\n",token);
+  token=strtok(NULL," =");
+  token=strtok(NULL," =");
+  os_printf("%s\r\n",token);
+  strcpy(word1,token);
+  strcpy(sta_pass,word1);
+
+  ap_config_func();
+}
+
+if(cmd32==0){
+  char word1[20];
+  os_strncpy(cadena,pdata,21);
+  cadena[21]='\0';
+  char *token=strtok((char *)cadena," ");
+  token=strtok(NULL,"&");
+  token=strtok(NULL,"=");
+
+    if(os_strncmp(token,"num1",strlen("num1"))==0){
+      token=strtok(NULL," ");
+      strcpy(word1,token);
+      int numero2=atoi(word1);
+      numero2=numero2/constante_grados;
+      numero2=numero2<<6;
+      int valorhigh=(numero2>>8);
+      int valorlow=(numero2);
+      uint8 msg2[]={0xF1,valorhigh,valorlow};
+      uart0_tx_buffer(msg2,sizeof(msg2));
+    }
+
+    if(os_strncmp(token,"num2",strlen("num2"))==0){
+      token=strtok(NULL," ");
+      strcpy(word1,token);
+      int numero2=atoi(word1);
+      numero2=numero2/constante_grados;
+      numero2=numero2<<6;
+      int valorhigh=(numero2>>8);
+      int valorlow=(numero2);
+      uint8 msg2[]={0xF2,valorhigh,valorlow};
+      uart0_tx_buffer(msg2,sizeof(msg2));
+    }
+
+    if(os_strncmp(token,"wait",strlen("wait"))==0){
+      token=strtok(NULL," ");
+      strcpy(word1,token);
+      int numero2=atoi(word1);
+      //os_delay_us(numero2*1000);
+    }
+
+    if(os_strncmp(token,"num3",strlen("num3"))==0){
+      token=strtok(NULL," ");
+      strcpy(word1,token);
+      int numero2=atoi(word1);
+      numero2=numero2/constante_grados;
+      numero2=numero2<<6;
+      int valorhigh=(numero2>>8);
+      int valorlow=(numero2);
+      uint8 msg2[]={0xF3,valorhigh,valorlow};
+      uart0_tx_buffer(msg2,sizeof(msg2));
+    }
+
+}
 
 
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
