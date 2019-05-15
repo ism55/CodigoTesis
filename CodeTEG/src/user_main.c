@@ -1,5 +1,12 @@
 #include <header.h>
 
+char buffercaja[2048],
+      puntero[2];
+
+
+// RUTINA DE INICIO AL PRESIONAR UN BOTON
+//F1 00 C0 F2 0B C0 F3 F4 40 F4 0E CC F5 0E CC F6 0E CC F1 00 00 F2 18 40 F3 DE 00 F4 16 32 F5 16 32 F6 16 32 F0 01 F4
+
 uint32 ICACHE_FLASH_ATTR
 user_rf_cal_sector_set(void)
 {
@@ -193,8 +200,7 @@ if(cmd4==0){
   token=strtok(NULL," =");
   strcpy(word1,token);
   int numero2=atoi(word1);
-  numero2=numero2/constante_grados;
-  numero2=numero2<<6;
+  numero2=(numero2/0.035)+5682;
   int valorhigh=(numero2>>8);
   int valorlow=(numero2);
   uint8 msg2[]={0xF4,valorhigh,valorlow};
@@ -231,8 +237,7 @@ if(cmd5==0){
 
   //numero=MyAtoi(msg2);
   int numero2=atoi(word1);
-  numero2=numero2/constante_grados;
-  numero2=numero2<<6;
+  numero2=(numero2/0.035)+5682;
   int valorhigh=(numero2>>8);
   int valorlow=(numero2);
   uint8 msg2[]={0xF5,valorhigh,valorlow};
@@ -256,8 +261,7 @@ if(cmd6==0){
   token=strtok(NULL," =");
   strcpy(word1,token);
   int numero2=atoi(word1);
-  numero2=numero2/constante_grados;
-  numero2=numero2<<6;
+  numero2=(numero2/0.035)+5682;
   int valorhigh=(numero2>>8);
   int valorlow=(numero2);
   uint8 msg2[]={0xF6,valorhigh,valorlow};
@@ -303,7 +307,17 @@ if(cmd10==0){
   strcpy(word1,token);
   strcpy(sta_pass,word1);
 
-  ap_config_func();
+  //ap_config_func();
+
+  /*
+
+  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
+  //Nombre y contraseña del router que se conectara
+  os_strcpy((char *)station_cfg.ssid,(const char *)sta_ssid); //NOMBRE DEL ROUTER A CONECTAR
+  os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
+  wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
+
+  */
 }
 
 if(cmd32==0){
@@ -323,7 +337,15 @@ if(cmd32==0){
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
       uint8 msg2[]={0xF1,valorhigh,valorlow};
-      uart0_tx_buffer(msg2,sizeof(msg2));
+
+      os_sprintf(puntero,"%c",msg2[0]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[1]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[2]);
+      os_strcat(buffercaja,puntero);
+
+      //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
     if(os_strncmp(token,"num2",strlen("num2"))==0){
@@ -335,13 +357,24 @@ if(cmd32==0){
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
       uint8 msg2[]={0xF2,valorhigh,valorlow};
-      uart0_tx_buffer(msg2,sizeof(msg2));
+
+      os_sprintf(puntero,"%c",msg2[0]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[1]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[2]);
+      os_strcat(buffercaja,puntero);
+
+      //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
     if(os_strncmp(token,"wait",strlen("wait"))==0){
       token=strtok(NULL," ");
       strcpy(word1,token);
       int numero2=atoi(word1);
+      esperar=numero2;
+
+      os_strcat(buffercaja,"w");
       //os_delay_us(numero2*1000);
     }
 
@@ -354,12 +387,31 @@ if(cmd32==0){
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
       uint8 msg2[]={0xF3,valorhigh,valorlow};
-      uart0_tx_buffer(msg2,sizeof(msg2));
+
+      os_sprintf(puntero,"%c",msg2[0]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[1]);
+      os_strcat(buffercaja,puntero);
+      os_sprintf(puntero,"%c",msg2[2]);
+      os_strcat(buffercaja,puntero);
+
+      //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
 }
+/*
+if(cmd33==0){
 
+  for(i=0;i<strlen(buffercaja);i++){
+    if(buffercaja[i]!='w'){
+      uart_tx_one_char(buffercaja[i]);
+  }else if(buffercaja[i]=='w'){
+      retardo(esperar);
+    }
+  }
+}
 
+*/
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
   //espconn_sent((struct espconn *) arg, "Informacion recibida\r\n", strlen("Información recibida\r\n"));
 }
@@ -458,6 +510,12 @@ void gpio_init(){
 
 }
 
+
+void retardo(int valor){
+  os_timer_arm();
+  os_timer_setfn();
+  os_timer_disarm();
+}
 
 void ICACHE_FLASH_ATTR
 user_init(void)
