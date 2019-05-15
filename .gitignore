@@ -1,3 +1,5 @@
 
 CodeTEG/.clang_complete
 CodeTEG/.gcc-flags.json
+*.json
+CodeTEG/.clang_complete
