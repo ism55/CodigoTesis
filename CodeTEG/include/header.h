@@ -21,7 +21,7 @@ float kpro1=0.33,
       koffset1=0,
       koffset2=39,
       koffset3=0,
-      constante_grados=1;
+      constante_grados=0.33;
 
 struct softap_config config;
 struct station_config station_cfg;
