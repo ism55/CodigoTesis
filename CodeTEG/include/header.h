@@ -225,7 +225,7 @@ const char *pagina2=
                     "<p class='label'>Mover el motor 1</p>"
                     "<form onsubmit='return false'>"
 
-                       "<input type='range' name='num1' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF1.value=this.value' >"
+                       "<input type='range' name='num1' min='-135' max='135' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF1.value=this.value' >"
 "<!--                       onchange='mover(this.value,this.name)'-->"
 
                         "<input type='number' name='xF1' placeholder='0' min='-135' max='135'>"
@@ -236,7 +236,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 2</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num2' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF2.value=this.value'>"
+                       "<input type='range' name='num2' min='-135' max='135' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF2.value=this.value'>"
                         "<input type='number' name='xF2' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 2' onclick='var that=this;this.form.num2.value=this.form.xF2.value;mover(this.form.num2.value,that.form.num2.name)'>"
                     "</form>"
@@ -244,7 +244,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 3</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num3' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF3.value=this.value'>"
+                       "<input type='range' name='num3' min='-135' max='135' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF3.value=this.value'>"
                         "<input type='number' name='xF3' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 3' onclick='var that=this;this.form.num3.value=this.form.xF3.value;mover(this.form.num3.value,that.form.num3.name)'>"
                     "</form>"
@@ -252,7 +252,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 4</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num4' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF4.value=this.value'>"
+                       "<input type='range' name='num4' min='-60' max='60' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF4.value=this.value'>"
                         "<input type='number' name='xF4' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 4' onclick='var that=this;this.form.num4.value=this.form.xF4.value;mover(this.form.num4.value,that.form.num4.name)'>"
                     "</form>"
@@ -260,7 +260,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 5</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num5' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF5.value=this.value'>"
+                       "<input type='range' name='num5' min='-60' max='60' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF5.value=this.value'>"
                         "<input type='number' name='xF5' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 5' onclick='var that=this;this.form.num5.value=this.form.xF5.value;mover(this.form.num5.value,that.form.num5.name)'>"
                     "</form>"
@@ -268,7 +268,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 6</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num6' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF6.value=this.value'>"
+                       "<input type='range' name='num6' min='-60' max='60' step='10' id='slider' oninput='mover(this.value,this.name);this.form.xF6.value=this.value'>"
                         "<input type='number' name='xF6' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 6' onclick='var that=this;this.form.num6.value=this.form.xF6.value;mover(this.form.num6.value,that.form.num6.name)'>"
                     "</form>"
@@ -392,9 +392,9 @@ const char *pagina2=
         "\nvar gripon='gripon';"
         "\nvar gripoff='gripoff';"
         "\nif(state=='ON'){"
-           "\nmover('=',gripon);"
+           "\nmover('',gripon);"
            "\n}else if(state=='OFF'){"
-               "\nmover('=',gripoff);"
+               "\nmover('',gripoff);"
            "\n}"
 
     "\n}"
@@ -429,8 +429,6 @@ const char *pagina2=
 "\nfunction areatexto(valor,repeticion){"
    "\nvar arrayOfLines = valor.split('\x5C\x6E');"
 
-    "\nfor (var i=0; i<repeticion;i++){"
-
         "\n$.each(arrayOfLines, function(index, item) {"
         "\nitem=item.split(' ');"
 
@@ -441,7 +439,7 @@ const char *pagina2=
 
 
         "\n});"
-    "\n}"
+        "\nmover(repeticion,'caja&inic');"
 "\n}"
 
 
