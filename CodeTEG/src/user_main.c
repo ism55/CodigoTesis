@@ -1,8 +1,13 @@
 #include <header.h>
 
+static os_timer_t ptimer;
+
+int esperar,repeticion;
+
 char buffercaja[2048],
       puntero[2];
 
+void xstrcat(char string1[],char string2[]);
 
 // RUTINA DE INICIO AL PRESIONAR UN BOTON
 //F1 00 C0 F2 0B C0 F3 F4 40 F4 0E CC F5 0E CC F6 0E CC F1 00 00 F2 18 40 F3 DE 00 F4 16 32 F5 16 32 F6 16 32 F0 01 F4
@@ -97,7 +102,7 @@ int cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON"));
 int cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
 int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
-
+int cmd33=os_strncmp(pdata,"GET /?caja&inic",strlen("GET /?caja&inic"));
 /*
 os_strncpy(cadena,pdata,16);
 cadena[16]='\0';
@@ -321,9 +326,9 @@ if(cmd10==0){
 }
 
 if(cmd32==0){
-  char word1[20];
-  os_strncpy(cadena,pdata,21);
-  cadena[21]='\0';
+  char word1[22];
+  os_strncpy(cadena,pdata,22);
+  cadena[22]='\0';
   char *token=strtok((char *)cadena," ");
   token=strtok(NULL,"&");
   token=strtok(NULL,"=");
@@ -336,15 +341,11 @@ if(cmd32==0){
       numero2=numero2<<6;
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
-      uint8 msg2[]={0xF1,valorhigh,valorlow};
+      char msg2[]={0xF1,valorhigh,valorlow};
 
-      os_sprintf(puntero,"%c",msg2[0]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[1]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[2]);
-      os_strcat(buffercaja,puntero);
 
+      xstrcat(buffercaja,msg2);
+      os_printf(buffercaja);
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
@@ -356,27 +357,14 @@ if(cmd32==0){
       numero2=numero2<<6;
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
-      uint8 msg2[]={0xF2,valorhigh,valorlow};
+      char msg2[]={0xF2,valorhigh,valorlow};
 
-      os_sprintf(puntero,"%c",msg2[0]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[1]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[2]);
-      os_strcat(buffercaja,puntero);
-
+      xstrcat(buffercaja,msg2);
+      os_printf(buffercaja);
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
-    if(os_strncmp(token,"wait",strlen("wait"))==0){
-      token=strtok(NULL," ");
-      strcpy(word1,token);
-      int numero2=atoi(word1);
-      esperar=numero2;
 
-      os_strcat(buffercaja,"w");
-      //os_delay_us(numero2*1000);
-    }
 
     if(os_strncmp(token,"num3",strlen("num3"))==0){
       token=strtok(NULL," ");
@@ -386,32 +374,53 @@ if(cmd32==0){
       numero2=numero2<<6;
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
-      uint8 msg2[]={0xF3,valorhigh,valorlow};
+      char msg2[]={0xF3,valorhigh,valorlow};
 
-      os_sprintf(puntero,"%c",msg2[0]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[1]);
-      os_strcat(buffercaja,puntero);
-      os_sprintf(puntero,"%c",msg2[2]);
-      os_strcat(buffercaja,puntero);
-
+      xstrcat(buffercaja,msg2);
+      os_printf(buffercaja);
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
+    if(os_strncmp(token,"wait",strlen("wait"))==0){
+      token=strtok(NULL," ");
+      strcpy(word1,token);
+      int numero2=atoi(word1);
+      esperar=numero2;
+
+      strcat(buffercaja,"w");
+
+      //char msg2[]={"w",esperar,NULL};
+
+      //strcat(buffercaja,msg2);
+
+      //os_delay_us(numero2*1000);
+      os_printf(buffercaja);
+    }
+
 }
-/*
+
 if(cmd33==0){
 
-  for(i=0;i<strlen(buffercaja);i++){
+//for(int k;k<repeticion;k++){
+
+  for(int i=0;i<strlen(buffercaja);i++){
     if(buffercaja[i]!='w'){
-      uart_tx_one_char(buffercaja[i]);
-  }else if(buffercaja[i]=='w'){
-      retardo(esperar);
+      // uart0_tx_buffer((uint8 *)(int)buffercaja[i],sizeof((uint8 *)(int)buffercaja[i]));
+      os_timer_arm(&ptimer, 1000, 0);
+      os_printf("%c",buffercaja[i]);
+      //os_printf("Nada\r\n");
+
+    }else if(buffercaja[i]=='w'){
+      os_printf("Nada\r\n");
+      os_timer_arm(&ptimer, 1000, 0);
     }
   }
+
+//}
+
 }
 
-*/
+
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
   //espconn_sent((struct espconn *) arg, "Informacion recibida\r\n", strlen("Información recibida\r\n"));
 }
@@ -420,6 +429,7 @@ if(cmd33==0){
 void ICACHE_FLASH_ATTR
 server_sent(void *arg)
 {
+  //      ENCENDER LED DE NOTIFICACION
 //  os_printf("Envío exitoso! bandera=%d\r\n",cmd1_flag);
 }
 
@@ -427,6 +437,7 @@ server_sent(void *arg)
 void ICACHE_FLASH_ATTR
 server_discon(void *arg)
 {   //AQUI APLICA EL ERROR HTTP 500: INTERNAL SERVER ERROR
+    //    APAGAR LED DE NOTIFICACION
 //  os_printf("Desconectado! \r\n");
 }
 
@@ -484,9 +495,9 @@ void ap_config_func()
 
 
 //Modo estación+punto de acceso
-  wifi_set_opmode(STATIONAP_MODE); //MODO ESTACION + ACCES POINT
+  wifi_set_opmode(SOFTAP_MODE); //MODO ESTACION + ACCES POINT
   wifi_softap_get_config(&config);  //DECLARA LA ESTRUCTURA config PARA CONFIGURAR EL MODO AP
-  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
+/*  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
 
 
 //  station_cfg.bssid_set=1;
@@ -496,6 +507,7 @@ void ap_config_func()
   os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
 
   wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
+*/
 
   os_memcpy(config.ssid, "esp8266_WiFi",strlen("esp8266_WiFi"));  //NOMBRE DEL WIFI SERVIDOR
   os_memcpy(config.password,"esp123",strlen("esp123")); //CLAVE DEL WIFI SERVIDOR
@@ -511,10 +523,20 @@ void gpio_init(){
 }
 
 
-void retardo(int valor){
-  os_timer_arm();
-  os_timer_setfn();
-  os_timer_disarm();
+void retardo(void *arg){
+
+  os_timer_disarm(&ptimer);
+}
+
+void xstrcat(char string1[],char string2[])
+{
+  int i,x,y;
+  x=strlen(string1)+1;
+  y=strlen(string2)+1;
+  for(i=0;i<y;i++)
+  { string1[i+x]=string2[i];
+  }//for ends
+  string1[x+y] = '\0';
 }
 
 void ICACHE_FLASH_ATTR
@@ -528,6 +550,10 @@ user_init(void)
 
 
     gpio_init();
+
+    os_timer_disarm(&ptimer);
+    os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
+
 
 //    os_printf("SDK version:%s\n", system_get_sdk_version());
 
