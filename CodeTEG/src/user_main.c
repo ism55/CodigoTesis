@@ -1,13 +1,19 @@
 #include <header.h>
 
-static os_timer_t ptimer;
+ static os_timer_t ptimer;
 
-int esperar,repeticion;
+ int esperar,repeticion;
+ uint8 bandera=0;
 
-char buffercaja[2048],
-      puntero[2];
+ char buffercaja[100];
 
-void xstrcat(char string1[],char string2[]);
+//       puntero[2];
+//
+//void xstrcat(char string1[],char string2[]);
+char *xstrcat(char *dest, const char *src);
+void retardo(void *arg);
+
+
 
 // RUTINA DE INICIO AL PRESIONAR UN BOTON
 //F1 00 C0 F2 0B C0 F3 F4 40 F4 0E CC F5 0E CC F6 0E CC F1 00 00 F2 18 40 F3 DE 00 F4 16 32 F5 16 32 F6 16 32 F0 01 F4
@@ -68,8 +74,8 @@ int cmd6=os_strncmp(pdata,"GET /?num6",strlen("GET /?num6"));
 int cmd7=os_strncmp(pdata,"GET /?gripon",strlen("GET /?gripon"));
 int cmd8=os_strncmp(pdata,"GET /?gripoff",strlen("GET /?gripoff"));
 
-int cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid"));
-int cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password"));
+// int cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid"));
+// int cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password"));
 
 int cmd11=os_strncmp(pdata,"GET /?Kp1",strlen("GET /?Kp1"));
 int cmd12=os_strncmp(pdata,"GET /?Ki1",strlen("GET /?Ki1"));
@@ -101,8 +107,8 @@ int cmd29=os_strncmp(pdata,"GET /?puente2=OFF",strlen("GET /?puente2=OFF"));
 int cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON"));
 int cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
-int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
-int cmd33=os_strncmp(pdata,"GET /?caja&inic",strlen("GET /?caja&inic"));
+ int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
+ int cmd33=os_strncmp(pdata,"GET /?caja&inic",strlen("GET /?caja&inic"));
 /*
 os_strncpy(cadena,pdata,16);
 cadena[16]='\0';
@@ -286,7 +292,7 @@ if(cmd7==0){
   uart0_tx_buffer(msg2,sizeof(msg2));
 
 }
-
+/*
 if(cmd9==0){
   char word1[20];
   os_strncpy(cadena,pdata,16);
@@ -314,16 +320,16 @@ if(cmd10==0){
 
   //ap_config_func();
 
-  /*
 
-  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
-  //Nombre y contraseña del router que se conectara
-  os_strcpy((char *)station_cfg.ssid,(const char *)sta_ssid); //NOMBRE DEL ROUTER A CONECTAR
-  os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
-  wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
+  //
+  // wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
+  // //Nombre y contraseña del router que se conectara
+  // os_strcpy((char *)station_cfg.ssid,(const char *)sta_ssid); //NOMBRE DEL ROUTER A CONECTAR
+  // os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
+  // wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
 
-  */
-}
+
+}*/
 
 if(cmd32==0){
   char word1[22];
@@ -343,9 +349,10 @@ if(cmd32==0){
       int valorlow=(numero2);
       char msg2[]={0xF1,valorhigh,valorlow};
 
-
-      xstrcat(buffercaja,msg2);
+      os_sprintf(buffercaja+strlen(buffercaja),msg2);
+      //xstrcat(buffercaja,msg2);
       os_printf(buffercaja);
+
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
@@ -357,10 +364,11 @@ if(cmd32==0){
       numero2=numero2<<6;
       int valorhigh=(numero2>>8);
       int valorlow=(numero2);
-      char msg2[]={0xF2,valorhigh,valorlow};
+      char msg2[]={0xF2,valorhigh,valorlow,0};
 
-      xstrcat(buffercaja,msg2);
-      os_printf(buffercaja);
+      //xstrcat(buffercaja,msg2);
+      os_sprintf(buffercaja+strlen(buffercaja),msg2);
+      //os_printf(buffercaja);
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
@@ -376,8 +384,9 @@ if(cmd32==0){
       int valorlow=(numero2);
       char msg2[]={0xF3,valorhigh,valorlow};
 
-      xstrcat(buffercaja,msg2);
-      os_printf(buffercaja);
+      //xstrcat(buffercaja,msg2);
+      os_sprintf(buffercaja +strlen(buffercaja),msg2);
+      //os_printf(buffercaja);
       //uart0_tx_buffer(msg2,sizeof(msg2));
     }
 
@@ -387,14 +396,14 @@ if(cmd32==0){
       int numero2=atoi(word1);
       esperar=numero2;
 
-      strcat(buffercaja,"w");
+      //strcat(buffercaja,"w");
 
-      //char msg2[]={"w",esperar,NULL};
+      char msg2[]={'w',esperar,0};
 
-      //strcat(buffercaja,msg2);
-
+      //xstrcat(buffercaja,msg2);
+      os_sprintf(buffercaja +strlen(buffercaja),msg2);
       //os_delay_us(numero2*1000);
-      os_printf(buffercaja);
+      //os_printf(buffercaja);
     }
 
 }
@@ -404,15 +413,24 @@ if(cmd33==0){
 //for(int k;k<repeticion;k++){
 
   for(int i=0;i<strlen(buffercaja);i++){
-    if(buffercaja[i]!='w'){
+    if(buffercaja[i]!='w' && bandera==0){
       // uart0_tx_buffer((uint8 *)(int)buffercaja[i],sizeof((uint8 *)(int)buffercaja[i]));
-      os_timer_arm(&ptimer, 1000, 0);
+      //os_timer_disarm(&ptimer);
+      //os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
+      //os_timer_arm(&ptimer, 1000, 1);
+
       os_printf("%c",buffercaja[i]);
       //os_printf("Nada\r\n");
 
-    }else if(buffercaja[i]=='w'){
-      os_printf("Nada\r\n");
+    }else if(buffercaja[i]=='w' && bandera==0){
+      bandera=1;
+      i++;
+      //os_timer_disarm(&ptimer);
+      //os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
+
       os_timer_arm(&ptimer, 1000, 0);
+      os_printf("Nada\r\n");
+      //os_timer_arm(&ptimer, 1000, 1);
     }
   }
 
@@ -510,8 +528,9 @@ void ap_config_func()
 */
 
   os_memcpy(config.ssid, "esp8266_WiFi",strlen("esp8266_WiFi"));  //NOMBRE DEL WIFI SERVIDOR
-  os_memcpy(config.password,"esp123",strlen("esp123")); //CLAVE DEL WIFI SERVIDOR
+  os_memcpy(config.password,"esp123456",strlen("esp123456")); //CLAVE DEL WIFI SERVIDOR
   config.ssid_len = strlen("esp8266_WiFi"); //LONGITUD DE SSID
+  config.authmode = AUTH_WPA_WPA2_PSK;
   wifi_softap_set_config(&config);  //CONFIGURADO EL MODO AP
 }
 
@@ -524,20 +543,42 @@ void gpio_init(){
 
 
 void retardo(void *arg){
-
+  bandera^=1;
+  //os_timer_disarm(&ptimer);
   os_timer_disarm(&ptimer);
 }
-
+/*
 void xstrcat(char string1[],char string2[])
 {
   int i,x,y;
-  x=strlen(string1)+1;
-  y=strlen(string2)+1;
-  for(i=0;i<y;i++)
-  { string1[i+x]=string2[i];
+  x=sizeof(string1);
+  y=sizeof(string2);
+
+  for(int k; k<x;k++){
+    if(string1[k]=='!'){
+      x=0;
+    }
+  }
+  for(i=0;i<y;i++){
+    string1[i+x]=string2[i];
   }//for ends
-  string1[x+y] = '\0';
+  //string1[x+y] = '\0';
+}*/
+
+
+
+char *
+xstrcat(char *dest, const char *src)
+{
+    //static int i=0;
+
+    size_t x=sizeof(dest)/sizeof(dest[0]);
+
+    strcpy(dest + x, src);
+
+    return dest;
 }
+
 
 void ICACHE_FLASH_ATTR
 user_init(void)
@@ -548,6 +589,7 @@ user_init(void)
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_U0TXD);
     UART_SetStopBits(UART0, ONE_STOP_BIT);
 
+    os_sprintf(buffercaja,"");
 
     gpio_init();
 
