@@ -212,20 +212,20 @@ const char *pagina2=
                 "<h2>Acceso remoto al controlador del brazo manipulador MA2000</h2>"
                 "<p>En esta pagina se encontraran los controles necesarios para mover y configurar el brazo robot MA2000 ubicado en el LCID de la Escuela de Ingenieria Electrica.</p>"
             "</div>"
-            "<div>"
+            /*"<div>"
                 "<form onsubmit='return false'>"
                     "<input type='number' name='rep' id='rep' placeholder='0'><br>"
                     "<textarea name='caja' id='caja' cols='30' rows='10'></textarea>"
                     "<input type='submit' value='pulsar' onclick='areatexto(this.form.caja.value,this.form.rep.value)'><br>"
                 "</form>"
-            "</div>"
+            "</div>"*/
             "<div id='movimiento'>"
                 "<h3>Movimiento del brazo robot en tiempo real</h3>"
                 "<article>"
                     "<p class='label'>Mover el motor 1</p>"
                     "<form onsubmit='return false'>"
 
-                       "<input type='range' name='num1' min='-135' max='135' step=10' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF1.value=this.value' >"
+                       "<input type='range' name='num1' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF1.value=this.value' >"
 "<!--                       onchange='mover(this.value,this.name)'-->"
 
                         "<input type='number' name='xF1' placeholder='0' min='-135' max='135'>"
@@ -236,7 +236,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 2</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num2' min='-135' max='135' step=10' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF2.value=this.value'>"
+                       "<input type='range' name='num2' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF2.value=this.value'>"
                         "<input type='number' name='xF2' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 2' onclick='var that=this;this.form.num2.value=this.form.xF2.value;mover(this.form.num2.value,that.form.num2.name)'>"
                     "</form>"
@@ -244,7 +244,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 3</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num3' min='-135' max='135' step=10' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF3.value=this.value'>"
+                       "<input type='range' name='num3' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF3.value=this.value'>"
                         "<input type='number' name='xF3' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 3' onclick='var that=this;this.form.num3.value=this.form.xF3.value;mover(this.form.num3.value,that.form.num3.name)'>"
                     "</form>"
@@ -423,7 +423,7 @@ const char *pagina2=
     "\nmover(state,that.name);"
 "}"
 
-
+/*
 "\nvar wait=0;"
 
 "\nfunction areatexto(valor,repeticion){"
@@ -491,7 +491,7 @@ const char *pagina2=
                     "\nbreak;"
             "\n}"
 "\n}"
-
+*/
 
 
     "\n</script>"
