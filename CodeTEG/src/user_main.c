@@ -4,6 +4,7 @@
 
  int esperar,repeticion;
  uint8 bandera=0;
+ int counter=0;
 
  char buffercaja[100];
 
@@ -107,13 +108,13 @@ int cmd29=os_strncmp(pdata,"GET /?puente2=OFF",strlen("GET /?puente2=OFF"));
 int cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON"));
 int cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
- int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
- int cmd33=os_strncmp(pdata,"GET /?caja&inic",strlen("GET /?caja&inic"));
-/*
+// int cmd32=os_strncmp(pdata,"GET /?caja",strlen("GET /?caja"));
+// int cmd33=os_strncmp(pdata,"GET /?caja&inic",strlen("GET /?caja&inic"));
+
 os_strncpy(cadena,pdata,16);
 cadena[16]='\0';
-os_printf(cadena);
-*/
+os_printf("\r\n%s",cadena);
+
 
 /******************************************************************************
 
@@ -330,7 +331,7 @@ if(cmd10==0){
 
 
 }*/
-
+/*
 if(cmd32==0){
   char word1[22];
   os_strncpy(cadena,pdata,22);
@@ -413,7 +414,7 @@ if(cmd33==0){
 //for(int k;k<repeticion;k++){
 
   for(int i=0;i<strlen(buffercaja);i++){
-    if(buffercaja[i]!='w' && bandera==0){
+    if(buffercaja[i]!='w'){
       // uart0_tx_buffer((uint8 *)(int)buffercaja[i],sizeof((uint8 *)(int)buffercaja[i]));
       //os_timer_disarm(&ptimer);
       //os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
@@ -422,21 +423,24 @@ if(cmd33==0){
       os_printf("%c",buffercaja[i]);
       //os_printf("Nada\r\n");
 
-    }else if(buffercaja[i]=='w' && bandera==0){
-      bandera=1;
+    }else if(buffercaja[i]=='w'){
+      //bandera=1;
       i++;
       //os_timer_disarm(&ptimer);
       //os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
 
-      os_timer_arm(&ptimer, 1000, 0);
-      os_printf("Nada\r\n");
+  //    os_timer_arm(&ptimer, 1000, 0);
+      counter=0;
+      while(counter<11);
+      os_printf("\r\nUn segundo!\r\n");
+
       //os_timer_arm(&ptimer, 1000, 1);
     }
   }
 
 //}
 
-}
+}*/
 
 
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
@@ -542,11 +546,13 @@ void gpio_init(){
 }
 
 
+/*
 void retardo(void *arg){
-  bandera^=1;
+  counter++;
   //os_timer_disarm(&ptimer);
-  os_timer_disarm(&ptimer);
+  //os_timer_disarm(&ptimer);
 }
+*/
 /*
 void xstrcat(char string1[],char string2[])
 {
@@ -566,7 +572,7 @@ void xstrcat(char string1[],char string2[])
 }*/
 
 
-
+/*
 char *
 xstrcat(char *dest, const char *src)
 {
@@ -578,7 +584,7 @@ xstrcat(char *dest, const char *src)
 
     return dest;
 }
-
+*/
 
 void ICACHE_FLASH_ATTR
 user_init(void)
@@ -589,13 +595,15 @@ user_init(void)
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_U0TXD);
     UART_SetStopBits(UART0, ONE_STOP_BIT);
 
-    os_sprintf(buffercaja,"");
+    //os_sprintf(buffercaja,"");
 
     gpio_init();
 
+    /*
     os_timer_disarm(&ptimer);
     os_timer_setfn(&ptimer, (os_timer_func_t *)retardo, NULL);
-
+    os_timer_arm(&ptimer, 100, 1);
+    */
 
 //    os_printf("SDK version:%s\n", system_get_sdk_version());
 
