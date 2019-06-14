@@ -1,6 +1,5 @@
 #include "stdlib.h"
 
-
 #include "osapi.h"
 #include "user_interface.h"
 #include "driver/uart.h"
@@ -14,26 +13,31 @@
 LOCAL struct espconn user_tcp_espconn;
 LOCAL struct _esp_tcp user_tcp;
 
+static os_timer_t p_timer;
+
+
 char cadena[20];
 float kpro1=0.33,
       kpro2=0.33,
       kpro3=0.33,
       koffset1=0,
       koffset2=39,
-      koffset3=0,
-      constante_grados=0.33;
+      koffset3=0;
+      //constante_grados=0.33;
 
 struct softap_config config;
 struct station_config station_cfg;
 
 
-char sta_ssid[]="";
-char sta_pass[]="";
+char sta_ssid[]=STA_SSID;
+char sta_pass[]=STA_PASSWORD;
 
-void ap_config_func();
+const char *respuesta1=
+"HTTP/1.1 200 OK\r\n\r\n";
 
 const char *pagina2=
-"HTTP/1.1 200 OK\r\n\r\n"
+"HTTP/1.1 200 OK\r\n"
+"Connection: close\r\n\r\n"
 "<!DOCTYPE html>"
 "<html lang='es'>"
 "<head>"
@@ -381,12 +385,22 @@ const char *pagina2=
     "</main>"
 
     "\n<script>"
-    "\n$.ajaxSetup({timeout: 3600000});"
 
     "\nfunction mover(pos, nombre) {"
-        //$.get("?" + nombre + "=" + pos);
-        "\nsetTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);"
-    "\n}"
+    //$.get("?" + nombre + "=" + pos);
+    //setTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);
+    //{Connection:close};
+    "\nvar URL = '?' + nombre + '=' + pos;"
+
+    "\n$.ajax({"
+        "\ntype: 'GET',"
+        "\nheaders: {"
+          "\n'Connection': 'close'"
+        "\n},"
+        "\nurl: URL"
+    "\n});"
+"\n}"
+
 
     "\nfunction pinza(state){"
         "\nvar gripon='gripon';"
@@ -497,3 +511,118 @@ const char *pagina2=
     "\n</script>"
 "</body>"
 "</html>";
+
+
+/******************************************************************************
+ * FunctionName : server_sent
+ * Description  : Función de respuesta ante envío de información
+ * Parameters   : arg -- estructura espconn
+  * Returns      : none
+*******************************************************************************/
+
+void ICACHE_FLASH_ATTR
+server_sent(void *arg);
+
+/******************************************************************************
+ * FunctionName : server_discon
+ * Description  : Función de respuesta ante desconexión
+ * Parameters   : arg -- estructura espconn
+  * Returns      : none
+*******************************************************************************/
+
+void ICACHE_FLASH_ATTR
+server_discon(void *arg);
+
+
+/******************************************************************************
+ * FunctionName : server_listen
+ * Description  : Función de respuesta ante un servidor creado exitosamente
+ * Parameters   : arg -- estructura espconn
+  * Returns      : none
+*******************************************************************************/
+
+void ICACHE_FLASH_ATTR
+server_listen(void *arg);
+
+/******************************************************************************
+ * FunctionName : server_recon
+ * Description  : Función de respuesta ante un error en la creación del servidor
+ * Parameters   : arg -- estructura espconn
+  * Returns      : none
+*******************************************************************************/
+
+void ICACHE_FLASH_ATTR
+server_recon(void *arg, sint8 err);
+
+/******************************************************************************
+ * FunctionName : init_tcp
+ * Description  : Funcion para configurar el servidor
+ * Parameters   : Local_port -- puerto donde se creara el socket
+  * Returns      : none
+*******************************************************************************/
+
+void init_tcp(uint32_t Local_port);
+
+/******************************************************************************
+ * FunctionName : ap_config_func
+ * Description  : Funcion para configurar el WiFi
+ * Parameters   : none
+  * Returns      : none
+*******************************************************************************/
+
+void ap_config_func();
+
+
+/******************************************************************************
+ * FunctionName : gpio_init
+ * Description  : Configura los pines de proposito general
+ * Parameters   : none
+  * Returns      : none
+*******************************************************************************/
+
+void gpio_init();
+
+/******************************************************************************
+ * FunctionName : mover_motor
+ * Description  : Mueve el motor indicado con el parametro comando
+ * Parameters   : comando -- nombre del motor a mover
+                  recibido -- string recibido en el request de la pagina
+                  constante_grados -- constante de calibracion para convertir la informacion a un valor binario
+                  constante_offset -- constante de calibracion para corregir el error de bits
+ * Returns      : none
+*******************************************************************************/
+
+void mover_motor(int comando, char* recibido,float constante_grados,float constante_offset);
+
+
+/******************************************************************************
+ * FunctionName : cambiar_constante
+ * Description  : Mueve el motor indicado con el parametro comando
+ * Parameters   : recibido -- string recibido en el request de la pagina
+                  constante_cambiada -- constante de calibracion cambiada
+ * Returns      : none
+*******************************************************************************/
+
+void cambiar_constante(char* recibido,float constante_cambiada);
+
+
+/******************************************************************************
+ * FunctionName : parametro_pid
+ * Description  : Modifica el parametro del PID
+ * Parameters   : comando -- parametro del PID a modificar
+                  recibido -- string recibido en el request de la pagina
+ * Returns      : none
+*******************************************************************************/
+
+void parametro_pid(int comando,char* recibido);
+
+/******************************************************************************
+ * FunctionName : puenteH
+ * Description  : Modifica el parametro del PID
+ * Parameters   : comando -- parametro del PID a modificar
+                  recibido -- string recibido en el request de la pagina
+                  instruccion -- Indica el encendido o apagado
+ * Returns      : none
+*******************************************************************************/
+
+void puenteH(int comando,char* recibido,int instruccion);
