@@ -4,8 +4,6 @@
 #define AP_SSID "ESP8266-WiFi"
 #define AP_PASSWORD "esp123456"
 
-#define STA_SSID "RocioRojas"
-#define STA_PASSWORD "AuraSanchez"
 
 #define MOTOR_1 0xF1
 #define MOTOR_2 0xF2
