@@ -1,5 +1,5 @@
 #include "stdlib.h"
-
+#include "stdio.h"
 #include "osapi.h"
 #include "user_interface.h"
 #include "driver/uart.h"
@@ -10,6 +10,16 @@
 #include "gpio.h"
 #include "eagle_soc.h"
 
+
+float kpro1=0.33,
+      kpro2=0.55,
+      kpro3=0.33,
+      koffset1=0,
+      koffset2=39,
+      koffset3=0;
+      //constante_grados=0.33;
+
+
 LOCAL struct espconn user_tcp_espconn;
 LOCAL struct _esp_tcp user_tcp;
 
@@ -17,20 +27,13 @@ static os_timer_t p_timer;
 
 
 char cadena[20];
-float kpro1=0.33,
-      kpro2=0.33,
-      kpro3=0.33,
-      koffset1=0,
-      koffset2=39,
-      koffset3=0;
-      //constante_grados=0.33;
 
 struct softap_config config;
 struct station_config station_cfg;
 
 
-char sta_ssid[]=STA_SSID;
-char sta_pass[]=STA_PASSWORD;
+char sta_ssid[32]="";
+char sta_pass[64]="";
 
 const char *respuesta1=
 "HTTP/1.1 200 OK\r\n\r\n";
@@ -216,20 +219,20 @@ const char *pagina2=
                 "<h2>Acceso remoto al controlador del brazo manipulador MA2000</h2>"
                 "<p>En esta pagina se encontraran los controles necesarios para mover y configurar el brazo robot MA2000 ubicado en el LCID de la Escuela de Ingenieria Electrica.</p>"
             "</div>"
-            /*"<div>"
+            "<div>"
                 "<form onsubmit='return false'>"
-                    "<input type='number' name='rep' id='rep' placeholder='0'><br>"
+
                     "<textarea name='caja' id='caja' cols='30' rows='10'></textarea>"
-                    "<input type='submit' value='pulsar' onclick='areatexto(this.form.caja.value,this.form.rep.value)'><br>"
+                    "<input type='submit' value='pulsar' onclick='areatexto(this.form.caja.value)'><br>"
                 "</form>"
-            "</div>"*/
+            "</div>"
             "<div id='movimiento'>"
                 "<h3>Movimiento del brazo robot en tiempo real</h3>"
                 "<article>"
                     "<p class='label'>Mover el motor 1</p>"
                     "<form onsubmit='return false'>"
 
-                       "<input type='range' name='num1' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF1.value=this.value' >"
+                       "<input type='range' name='num1' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF1.value=this.value' >"
 "<!--                       onchange='mover(this.value,this.name)'-->"
 
                         "<input type='number' name='xF1' placeholder='0' min='-135' max='135'>"
@@ -240,7 +243,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 2</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num2' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF2.value=this.value'>"
+                       "<input type='range' name='num2' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF2.value=this.value'>"
                         "<input type='number' name='xF2' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 2' onclick='var that=this;this.form.num2.value=this.form.xF2.value;mover(this.form.num2.value,that.form.num2.name)'>"
                     "</form>"
@@ -248,7 +251,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 3</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num3' min='-135' max='135' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF3.value=this.value'>"
+                       "<input type='range' name='num3' min='-135' max='135' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF3.value=this.value'>"
                         "<input type='number' name='xF3' placeholder='0' min='-135' max='135'>"
                         "<input type='submit' value='Motor 3' onclick='var that=this;this.form.num3.value=this.form.xF3.value;mover(this.form.num3.value,that.form.num3.name)'>"
                     "</form>"
@@ -256,7 +259,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 4</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num4' min='-60' max='60' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF4.value=this.value'>"
+                       "<input type='range' name='num4' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF4.value=this.value'>"
                         "<input type='number' name='xF4' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 4' onclick='var that=this;this.form.num4.value=this.form.xF4.value;mover(this.form.num4.value,that.form.num4.name)'>"
                     "</form>"
@@ -264,7 +267,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 5</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num5' min='-60' max='60' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF5.value=this.value'>"
+                       "<input type='range' name='num5' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF5.value=this.value'>"
                         "<input type='number' name='xF5' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 5' onclick='var that=this;this.form.num5.value=this.form.xF5.value;mover(this.form.num5.value,that.form.num5.name)'>"
                     "</form>"
@@ -272,7 +275,7 @@ const char *pagina2=
                 "<article>"
                    "<p class='label'>Mover el motor 6</p>"
                     "<form onsubmit='return false'>"
-                       "<input type='range' name='num6' min='-60' max='60' step='1' id='slider' onchange='mover(this.value,this.name)' oninput='this.form.xF6.value=this.value'>"
+                       "<input type='range' name='num6' min='-60' max='60' step='5' id='slider' oninput='mover(this.value,this.name);this.form.xF6.value=this.value'>"
                         "<input type='number' name='xF6' placeholder='0' min='-60' max='60'>"
                         "<input type='submit' value='Motor 6' onclick='var that=this;this.form.num6.value=this.form.xF6.value;mover(this.form.num6.value,that.form.num6.name)'>"
                     "</form>"
@@ -437,10 +440,8 @@ const char *pagina2=
     "\nmover(state,that.name);"
 "}"
 
-/*
-"\nvar wait=0;"
 
-"\nfunction areatexto(valor,repeticion){"
+"\nfunction areatexto(valor){"
    "\nvar arrayOfLines = valor.split('\x5C\x6E');"
 
         "\n$.each(arrayOfLines, function(index, item) {"
@@ -453,7 +454,6 @@ const char *pagina2=
 
 
         "\n});"
-        "\nmover(repeticion,'caja&inic');"
 "\n}"
 
 
@@ -462,50 +462,45 @@ const char *pagina2=
 "\nswitch (item0) {"
                 "\ncase 'q1':"
 
-                    "\nmover(item1,'caja&num1');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num1');"
                     "\nbreak;"
 
                 "\ncase 'q2':"
 
-                    "\nmover(item1,'caja&num2');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num2');"
                     "\nbreak;"
 
                 "\ncase 'q3':"
 
-                    "\nmover(item1,'caja&num3');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num3');"
                     "\nbreak;"
 
                 "\ncase 'q4':"
 
-                    "\nmover(item1,'caja&num4');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num4');"
                     "\nbreak;"
 
                 "\ncase 'q5':"
 
-                    "\nmover(item1,'caja&num5');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num5');"
                     "\nbreak;"
 
                 "\ncase 'q6':"
-
-                    "\nmover(item1,'caja&num6');"
-                    "\nwait=0;"
+                    "\nmover(item1,'num6');"
                     "\nbreak;"
 
-                "\ncase 'wait':"
-
-                    "\nwait=mover(item1,'caja&wait');"
+                "\ncase 'gripon':"
+                    "\npinza('ON');"
                     "\nbreak;"
-                "\ndefault:"
-                    "\nwait=0;"
+
+                "\ncase 'gripoff':"
+                    "\npinza('OFF');"
+                    "\nbreak;"
+              "\ndefault:"
                     "\nbreak;"
             "\n}"
 "\n}"
-*/
+
 
 
     "\n</script>"
@@ -603,7 +598,7 @@ void mover_motor(int comando, char* recibido,float constante_grados,float consta
  * Returns      : none
 *******************************************************************************/
 
-void cambiar_constante(char* recibido,float constante_cambiada);
+float cambiar_constante(char* recibido);
 
 
 /******************************************************************************
@@ -626,3 +621,13 @@ void parametro_pid(int comando,char* recibido);
 *******************************************************************************/
 
 void puenteH(int comando,char* recibido,int instruccion);
+
+
+/******************************************************************************
+ * FunctionName : myatof
+ * Description  : Convierte de ascii a float
+ * Parameters   : char -- string a convertir
+ * Returns      : valor convertido a float
+*******************************************************************************/
+
+float myatof(char *p);
