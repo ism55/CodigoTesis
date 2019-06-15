@@ -1,6 +1,15 @@
 
 #include <header.h>
 
+static bool borrar=false;
+
+struct con_wifi {
+  char con_ssid[32];
+  char con_pass[64];
+};
+
+struct con_wifi valorwifi;
+
 // RUTINA DE INICIO AL PRESIONAR UN BOTON
 //F1 00 C0 F2 0B C0 F3 F4 40 F4 0E CC F5 0E CC F6 0E CC F1 00 00 F2 18 40 F3 DE 00 F4 16 32 F5 16 32 F6 16 32 F0 01 F4
 
@@ -61,8 +70,8 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
     cmd7=os_strncmp(pdata,"GET /?gripon",strlen("GET /?gripon")),
     cmd8=os_strncmp(pdata,"GET /?gripoff",strlen("GET /?gripoff")),
 
-// int cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid"));
-// int cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password"));
+    cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid")),
+    cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password")),
 
     cmd11=os_strncmp(pdata,"GET /?Kp1",strlen("GET /?Kp1")),
     cmd12=os_strncmp(pdata,"GET /?Ki1",strlen("GET /?Ki1")),
@@ -94,15 +103,16 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
     cmd30=os_strncmp(pdata,"GET /?puente3=ON",strlen("GET /?puente3=ON")),
     cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
+
 // os_strncpy(cadena,pdata,16);
 // cadena[16]='\0';
 // os_printf("\r\n%s",cadena);
 
 if(cmd00==0){
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
-  uint8 4inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4};   //SE GENERA LA TRAMA
+  uint8 inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4};   //SE GENERA LA TRAMA
   uart0_tx_buffer(inicio,sizeof(inicio));   //SE TRANSMITE LA TRAMA POR UART
-  espconn_disconnect(pespconn);
+  //espconn_disconnect(pespconn);
 }
 
 if (cmd1==0){     //VERIFICA SI SE RECIBIO UNA INSTRUCCION PARA EL MOTOR 1
@@ -161,34 +171,69 @@ if(cmd7==0){
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
-/*
+
 if(cmd9==0){
-  char word1[20];
-  os_strncpy(cadena,pdata,16);
-  cadena[16]='\0';
+  char word1[32];
+  os_strncpy(cadena,pdata,30);
+  cadena[30]='\0';
   char *token=strtok((char *)cadena," =");
-  os_printf("%s\r\n",token);
+
+  //os_printf("%s\r\n",token);
+
   token=strtok(NULL," =");
   token=strtok(NULL," =");
-  os_printf("%s\r\n",token);
+
   strcpy(word1,token);
-  strcpy(sta_ssid,word1);
+  word1[32]='\0';
+  for(int i = 0; i < strlen(word1); i++){
+    if(word1[i] == '_')
+        word1[i] = ' ';
+}
+  os_printf("%s\r\n",word1);
+
+  if (os_strcmp(word1,"null")==0){
+    strcpy(sta_ssid,"");
+    sta_ssid[32]='\0';
+  } else {
+    strcpy(sta_ssid,word1);
+    sta_ssid[32]='\0';
+  }
+
+  os_strcpy((char *)valorwifi.con_ssid,(char *)sta_ssid); //CLAVE DEL ROUTER A CONECTAR
+
 }
 
 if(cmd10==0){
-  char word1[20];
-  os_strncpy(cadena,pdata,16);
-  cadena[16]='\0';
+  char word1[64];
+  os_strncpy(cadena,pdata,30);
+  cadena[30]='\0';
   char *token=strtok((char *)cadena," =");
-  os_printf("%s\r\n",token);
+
   token=strtok(NULL," =");
   token=strtok(NULL," =");
-  os_printf("%s\r\n",token);
   strcpy(word1,token);
-  strcpy(sta_pass,word1);
+  word1[20]='\0';
+  for(int i = 0; i < strlen(word1); i++){
+    if(word1[i] == '_')
+        word1[i] = ' ';
+}
+  os_printf("%s\r\n",word1);
 
-  //ap_config_func();
+  if (os_strcmp(word1,"null")==0){
+    strcpy(sta_pass,"");
+    sta_pass[64]='\0';
+  } else {
+    strcpy(sta_pass,word1);
+    sta_pass[64]='\0';
+  }
 
+  os_strcpy((char *)valorwifi.con_pass,(char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
+
+  //espconn_delete(pespconn);
+  borrar=true;
+  espconn_disconnect(pespconn);
+
+  //init_tcp(8266);
 
   //
   // wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
@@ -198,7 +243,7 @@ if(cmd10==0){
   // wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
 
 
-}*/
+}
 
 
 
@@ -241,27 +286,27 @@ if(cmd11==0){
 }
 
 if (cmd20==0){
-  cambiar_constante(pdata, kpro1);
+  kpro1=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if (cmd21==0){
-  cambiar_constante(pdata, koffset1);
+  koffset1=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if (cmd22==0){
-  cambiar_constante(pdata, kpro2);
+  kpro2=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if (cmd23==0){
-  cambiar_constante(pdata, koffset2);
+  koffset2=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if (cmd24==0){
-  cambiar_constante(pdata, kpro3);
+  kpro3=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if (cmd25==0){
-  cambiar_constante(pdata, koffset3);
+  koffset3=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
@@ -302,6 +347,9 @@ if (cmd26==0){
 void ICACHE_FLASH_ATTR
 user_init(void)
 {
+
+
+
     gpio_init();
 //Llamada de función para la configuración del servidor
     ap_config_func();
@@ -364,10 +412,31 @@ GPIO_OUTPUT_SET(D2, 0);
 void ICACHE_FLASH_ATTR
 server_discon(void *arg)
 {
+
+  struct espconn *pespconn = (struct espconn *)arg;
+
+  if(borrar){
+      //espconn_delete(pespconn);
+      wifi_set_opmode(NULL_MODE);
+
+      os_printf("\r\nEs hora de borrar! \r\n");
+
+      os_printf("PASS: %s\r\n",valorwifi.con_pass);
+      os_printf("SSID: %s\r\n",valorwifi.con_ssid);
+
+      //os_strcpy((char *)sta_pass,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
+      //os_strcpy((char *)sta_ssid,(const char *)valorwifi.con_ssid); //CLAVE DEL ROUTER A CONECTAR
+
+      ap_config_func();
+      init_tcp(8266);
+
+  } else {
     //    APAGAR LED DE NOTIFICACION
-  os_printf("Desconectado! \r\n");
+  os_printf("\r\nDesconectado! \r\n");
   init_tcp(8266);
   GPIO_OUTPUT_SET(D4, 1);
+  }
+
 }
 
 
@@ -402,8 +471,8 @@ void ICACHE_FLASH_ATTR
 server_recon(void *arg, sint8 err)
 {
   //        AQUI APLICA EL ERROR HTTP 404: NOT FOUND
-//  os_printf("Error de conexión, código de error: %d\r\n", err);
-  //os_printf("Error de conexión, código de error: %d\r\n", err);
+  /*os_printf("Error de conexión, código de error: %d\r\n", err);
+  //os_printf("Error de conexión, código de error: %d\r\n", err);*/
 }
 
 
@@ -440,11 +509,11 @@ void init_tcp(uint32_t Local_port)
   * Returns      : none
 *******************************************************************************/
 
-void ap_config_func()
+void ICACHE_FLASH_ATTR ap_config_func()
 {
 
 //Modo estación+punto de acceso
-  wifi_set_opmode(STATIONAP_MODE); //MODO ESTACION + ACCES POINT
+  wifi_set_opmode(STATIONAP_MODE); //MODO ESTACION + ACCESS POINT
   wifi_softap_get_config(&config);  //DECLARA LA ESTRUCTURA config PARA CONFIGURAR EL MODO AP
   wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
 
@@ -452,10 +521,13 @@ void ap_config_func()
   station_cfg.bssid_set=1;
 
 //Nombre y contraseña del router que se conectara
-  os_strcpy((char *)station_cfg.ssid,(const char *)sta_ssid); //NOMBRE DEL ROUTER A CONECTAR
-  os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
+  os_strcpy((char *)station_cfg.ssid,(const char *)valorwifi.con_ssid); //NOMBRE DEL ROUTER A CONECTAR
+  os_strcpy((char *)station_cfg.password,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
 
   wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
+
+  os_printf("CONF PASS: %s\r\n",station_cfg.password);
+  os_printf("CONF SSID: %s\r\n",station_cfg.ssid);
 
   os_memcpy(config.ssid, AP_SSID,strlen(AP_SSID));  //NOMBRE DEL WIFI SERVIDOR
   os_memcpy(config.password,AP_PASSWORD,strlen(AP_PASSWORD)); //CLAVE DEL WIFI SERVIDOR
@@ -554,7 +626,7 @@ void mover_motor(int comando, char* recibido,float constante_grados,float consta
  * Returns      : none
 *******************************************************************************/
 
-void cambiar_constante(char* recibido,float constante_cambiada){
+float cambiar_constante(char* recibido){
 
   char word1[20];   //VARIABLE AUXILIAR
   int numero;     //VARIABLE AUXILIAR PARA EL NUMERO RECIBIDO
@@ -564,8 +636,8 @@ void cambiar_constante(char* recibido,float constante_cambiada){
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   strcpy(word1,token);  //GUARDA LO OBTENIDO EN LA VARIABLE AUXILIAR word1
-  int numero2=atoi(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
-  numero2=constante_cambiada; //SE CAMBIA EL VALOR DE LA constante_cambiada
+  float numero2=myatof(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
+  return numero2;
 }
 
 
@@ -608,4 +680,36 @@ void puenteH(int comando,char* recibido,int instruccion){
 
   uint8 msg2[]={comando,0x00,instruccion};   //SE GENERA LA TRAMA
   uart0_tx_buffer(msg2,sizeof(msg2));   //SE TRANSMITE LA TRAMA POR UART
+}
+
+/******************************************************************************
+ * FunctionName : myatof
+ * Description  : Convierte de ascii a float
+ * Parameters   : char -- string a convertir
+ * Returns      : valor convertido a float
+*******************************************************************************/
+
+float myatof(char *p) {
+  // here i took another two   variables for counting the number of digits in mantissa
+  int i, num = 0, num2 = 0, pnt_seen = 0, x = 0, y = 1;
+  float f1, f2, f3;
+  for (i = 0; p[i]; i++)
+    if (p[i] == '.') {
+      pnt_seen = i;
+      break;
+    }
+  for (i = 0; p[i]; i++) {
+    if (i < pnt_seen) num = num * 10 + (p[i] - 48);
+    else if (i == pnt_seen) continue;
+    else {
+      num2 = num2 * 10 + (p[i] - 48);
+      ++x;
+    }
+  }
+  // it takes 10 if it has 1 digit ,100 if it has 2 digits in mantissa
+  for (i = 1; i <= x; i++)
+    y = y * 10;
+  f2 = num2 / (float) y;
+  f3 = num + f2;
+  return f3;
 }
