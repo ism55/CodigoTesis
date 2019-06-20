@@ -104,15 +104,15 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
     cmd31=os_strncmp(pdata,"GET /?puente3=OFF",strlen("GET /?puente3=OFF"));
 
 
-// os_strncpy(cadena,pdata,16);
+/*// os_strncpy(cadena,pdata,16);
 // cadena[16]='\0';
-// os_printf("\r\n%s",cadena);
+// os_printf("\r\n%s",cadena);*/
 
 if(cmd00==0){
   espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
   uint8 inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4};   //SE GENERA LA TRAMA
   uart0_tx_buffer(inicio,sizeof(inicio));   //SE TRANSMITE LA TRAMA POR UART
-  //espconn_disconnect(pespconn);
+
 }
 
 if (cmd1==0){     //VERIFICA SI SE RECIBIO UNA INSTRUCCION PARA EL MOTOR 1
@@ -121,7 +121,6 @@ if (cmd1==0){     //VERIFICA SI SE RECIBIO UNA INSTRUCCION PARA EL MOTOR 1
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
-
 if(cmd2==0){
   mover_motor(MOTOR_2, pdata, kpro2, koffset2);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
@@ -172,6 +171,7 @@ if(cmd7==0){
   espconn_disconnect(pespconn);
 }
 
+/*
 if(cmd9==0){
   char word1[32];
   os_strncpy(cadena,pdata,30);
@@ -189,7 +189,7 @@ if(cmd9==0){
     if(word1[i] == '_')
         word1[i] = ' ';
 }
-  os_printf("%s\r\n",word1);
+//  os_printf("%s\r\n",word1);
 
   if (os_strcmp(word1,"null")==0){
     strcpy(sta_ssid,"");
@@ -200,7 +200,7 @@ if(cmd9==0){
   }
 
   os_strcpy((char *)valorwifi.con_ssid,(char *)sta_ssid); //CLAVE DEL ROUTER A CONECTAR
-
+  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
 }
 
 if(cmd10==0){
@@ -217,7 +217,7 @@ if(cmd10==0){
     if(word1[i] == '_')
         word1[i] = ' ';
 }
-  os_printf("%s\r\n",word1);
+  //os_printf("%s\r\n",word1);
 
   if (os_strcmp(word1,"null")==0){
     strcpy(sta_pass,"");
@@ -230,55 +230,53 @@ if(cmd10==0){
   os_strcpy((char *)valorwifi.con_pass,(char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
 
   //espconn_delete(pespconn);
+  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   borrar=true;
   espconn_disconnect(pespconn);
-
-  //init_tcp(8266);
-
-  //
-  // wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
-  // //Nombre y contraseña del router que se conectara
-  // os_strcpy((char *)station_cfg.ssid,(const char *)sta_ssid); //NOMBRE DEL ROUTER A CONECTAR
-  // os_strcpy((char *)station_cfg.password,(const char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
-  // wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
-
-
 }
 
-
+*/
 
 if(cmd11==0){
   parametro_pid(KP_1,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd12==0){
   parametro_pid(KI_1,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd13==0){
   parametro_pid(KD_1,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd14==0){
   parametro_pid(KP_2,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd15==0){
   parametro_pid(KI_2,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd16==0){
   parametro_pid(KD_2,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd17==0){
   parametro_pid(KP_3,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd18==0){
   parametro_pid(KI_3,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd19==0){
   parametro_pid(KD_3,pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
@@ -289,22 +287,27 @@ if (cmd20==0){
   kpro1=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd21==0){
   koffset1=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd22==0){
   kpro2=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd23==0){
   koffset2=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd24==0){
   kpro3=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd25==0){
   koffset3=cambiar_constante(pdata);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
@@ -316,27 +319,34 @@ if (cmd26==0){
   puenteH(PUENTE_H,pdata,PH1_ON);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd27==0){
   puenteH(PUENTE_H,pdata,PH1_OFF);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd28==0){
   puenteH(PUENTE_H,pdata,PH2_ON);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd29==0){
   puenteH(PUENTE_H,pdata,PH2_OFF);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd30==0){
   puenteH(PUENTE_H,pdata,PH3_ON);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
+
 } else if (cmd31==0){
   puenteH(PUENTE_H,pdata,PH3_OFF);
   espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
+
+//if (cmd00 && cmd1 && cmd2 && cmd3 && cmd4 && cmd5 && cmd6 && cmd7 && cmd8 && cmd9 && cmd10 && cmd11 && cmd12 && cmd13 && cmd14 && cmd15 && cmd16 && cmd17 && cmd18 && cmd19 && cmd20 && cmd21 && cmd22 && cmd23 && cmd24 && cmd25 && cmd26 && cmd27 && cmd28 && cmd29 && cmd30 && cmd31) {}
 
 }
 
@@ -349,8 +359,8 @@ user_init(void)
 {
 
 
-
     gpio_init();
+    GPIO_OUTPUT_SET(D4, 1);
 //Llamada de función para la configuración del servidor
     ap_config_func();
 /*Inicio del protocolo de comunicación por tcp
@@ -379,7 +389,8 @@ la información*/
 //////////////////////////////////////////////////////////////////////////
 
 void parpadear(void *arg){
-      os_timer_disarm(&p_timer);
+  GPIO_OUTPUT_SET(D2, 0);
+  os_timer_disarm(&p_timer);
 }
 
 
@@ -398,8 +409,7 @@ server_sent(void *arg)
 GPIO_OUTPUT_SET(D2, 1);
 os_timer_disarm(&p_timer);
 os_timer_setfn(&p_timer, (os_timer_func_t *)parpadear, NULL);
-os_timer_arm(&p_timer, 100, 0);
-GPIO_OUTPUT_SET(D2, 0);
+os_timer_arm(&p_timer, 1000, 0);
 }
 
 /******************************************************************************
@@ -412,29 +422,32 @@ GPIO_OUTPUT_SET(D2, 0);
 void ICACHE_FLASH_ATTR
 server_discon(void *arg)
 {
+  os_delay_us(10000);
 
   struct espconn *pespconn = (struct espconn *)arg;
 
   if(borrar){
       //espconn_delete(pespconn);
+      wifi_station_disconnect();
       wifi_set_opmode(NULL_MODE);
 
-      os_printf("\r\nEs hora de borrar! \r\n");
+    //  os_printf("\r\nEs hora de borrar! \r\n");
 
-      os_printf("PASS: %s\r\n",valorwifi.con_pass);
-      os_printf("SSID: %s\r\n",valorwifi.con_ssid);
+    //  os_printf("PASS: %s\r\n",valorwifi.con_pass);
+    //  os_printf("SSID: %s\r\n",valorwifi.con_ssid);
 
       //os_strcpy((char *)sta_pass,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
       //os_strcpy((char *)sta_ssid,(const char *)valorwifi.con_ssid); //CLAVE DEL ROUTER A CONECTAR
 
       ap_config_func();
+      wifi_station_connect();
       init_tcp(8266);
 
   } else {
     //    APAGAR LED DE NOTIFICACION
-  os_printf("\r\nDesconectado! \r\n");
+  //os_printf("\r\nDesconectado! \r\n");
   init_tcp(8266);
-  GPIO_OUTPUT_SET(D4, 1);
+  GPIO_OUTPUT_SET(D4, 0);
   }
 
 }
@@ -499,7 +512,8 @@ void init_tcp(uint32_t Local_port)
   espconn_accept(&user_tcp_espconn);
   espconn_regist_time(&user_tcp_espconn,7200,0);
 
-  GPIO_OUTPUT_SET(D4, 0);
+//  os_printf("\r\nConectado! \r\n");
+  GPIO_OUTPUT_SET(D4, 1);
 }
 
 /******************************************************************************
@@ -509,13 +523,13 @@ void init_tcp(uint32_t Local_port)
   * Returns      : none
 *******************************************************************************/
 
-void ICACHE_FLASH_ATTR ap_config_func()
+void ap_config_func()
 {
 
 //Modo estación+punto de acceso
-  wifi_set_opmode(STATIONAP_MODE); //MODO ESTACION + ACCESS POINT
+  wifi_set_opmode(SOFTAP_MODE); //MODO ESTACION + ACCESS POINT
   wifi_softap_get_config(&config);  //DECLARA LA ESTRUCTURA config PARA CONFIGURAR EL MODO AP
-  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
+/*  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
 
 
   station_cfg.bssid_set=1;
@@ -526,8 +540,8 @@ void ICACHE_FLASH_ATTR ap_config_func()
 
   wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
 
-  os_printf("CONF PASS: %s\r\n",station_cfg.password);
-  os_printf("CONF SSID: %s\r\n",station_cfg.ssid);
+  //os_printf("\r\nCONF PASS: %s\r\n",station_cfg.password);
+  //os_printf("\r\nCONF SSID: %s\r\n",station_cfg.ssid);*/
 
   os_memcpy(config.ssid, AP_SSID,strlen(AP_SSID));  //NOMBRE DEL WIFI SERVIDOR
   os_memcpy(config.password,AP_PASSWORD,strlen(AP_PASSWORD)); //CLAVE DEL WIFI SERVIDOR
@@ -546,10 +560,10 @@ void ICACHE_FLASH_ATTR ap_config_func()
 
 void gpio_init(){
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
-  gpio_output_set(D4,0, D4,0);
+  gpio_output_set(GPIO_ID_PIN(D4),0, GPIO_ID_PIN(D4),0);
 
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4 );
-  gpio_output_set(D2,0, D2,0);
+  gpio_output_set(GPIO_ID_PIN(D2),0, GPIO_ID_PIN(D2),0);
 
   //CONFIGURARCION DEL UART
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);
