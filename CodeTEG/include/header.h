@@ -39,8 +39,7 @@ const char *respuesta1=
 "HTTP/1.1 200 OK\r\n\r\n";
 
 const char *pagina2=
-"HTTP/1.1 200 OK\r\n"
-"Connection: close\r\n\r\n"
+"HTTP/1.1 200 OK\r\n\r\n"
 "<!DOCTYPE html>"
 "<html lang='es'>"
 "<head>"
@@ -200,6 +199,7 @@ const char *pagina2=
 "\n}"
 "\n</style>"
     "\n<script src='http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>"
+    "\n<link rel='icon' href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAB6UlEQVQ4T2VTPei5URS+yaZ8lc+ySSTEZmAhKQtlRhkMMlqUYlAWG4vJppSYlIEN+UiyGBmVZDApOf97z997f+/9/Z56uuc8557Tec89L4Ff+Hw+0Ov1oFAogMlkgtVqBYFAABqNBrxeL4zLIRQYDodgs9mAEIK0Wq1QKpXQdjqdoNPpIJ1Ow/V6/WbICrRaLZ5osVig3W7D8XgEpVKJWrPZBLfbjbbD4YDb7YZ5WGCz2fBkRo1GA/1+Hylp6/UaE/x+P/oejwd9LKDX6/lFiZVKBcxmM/c7nQ5EIhEIBoNcGwwGQPb7PRdYayqVCm3WsqTHYjFIJBLcl2gwGIDU63UuTKdTbOtyuYDL5eI6exWfz8d9OZXn85me/3G/3/F8v9/kdDqhzRCPx4larSZ0DmQ2m5HdbveNUGSzWV4tHA5jB6xlSWOUIxQKCTFSrVYF4fF4CL5UlCGfzwsxpHyIRqMRarWacGE8HsNisQD6CYLOyDYV+9NqtSjI310iw29N4mg0AgU1yHw+JwqFgtDtYi4H3Y+v9Rd0K0kymaRlvqCTxX2nMc5isQiTyUTQGL1eL9AXwzxhxMvlEux2O7+43W4hlUoJyeVymf8HDOIbUdAdgMPhAJlMBv1cLgfRaBS63S48n0/UfgDwD6vp+/eL/pLhAAAAAElFTkSuQmCC' type='image/x-icon'>"
 "\n</head>"
 "<body>"
 
@@ -291,7 +291,7 @@ const char *pagina2=
             "</div>"
 
             "<div>"
-            "<div id='wifi'>"
+          /*  "<div id='wifi'>"
               "<h3>CONFIGURAR WIFI</h3>"
                       "<p>Introduzca el nombre del WiFi y su clave. (Por favor, siempre configure estos valores antes de iniciar movimiento. De no poseer Router, envie los valores en blanco.)</p>"
 
@@ -302,7 +302,7 @@ const char *pagina2=
                                 "<input type='textbox' name='password' placeholder='PASSWORD'>"
                                 "<input type='submit' value='PASSWORD' onclick='mover(this.form.password.value,this.form.password.name)'>"
                         "</form>"
-
+*/
                    "<div id='laizquierda'>"
 
                     "<h4>PID</h4>"
@@ -389,19 +389,21 @@ const char *pagina2=
 
     "\n<script>"
 
+    "\n/*global $, prompt, alert, window*/"
+    "\n/*jslint node: true */"
+    "\n'use strict';"
+
+
     "\nfunction mover(pos, nombre) {"
-    //$.get("?" + nombre + "=" + pos);
+    "\n$.get('?' + nombre + '=' + pos);"
     //setTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);
     //{Connection:close};
-    "\nvar URL = '?' + nombre + '=' + pos;"
+/*    //"\nvar URL = '?' + nombre + '=' + pos;"
 
-    "\n$.ajax({"
-        "\ntype: 'GET',"
-        "\nheaders: {"
-          "\n'Connection': 'close'"
-        "\n},"
-        "\nurl: URL"
-    "\n});"
+    //"\n$.ajax({"
+      //  "\ntype: 'GET',"
+      //  "\nurl: URL"
+    //"\n});"*/
 "\n}"
 
 
@@ -416,7 +418,7 @@ const char *pagina2=
 
     "\n}"
 
-"var pass;"
+/*"var pass;"
 "var exito='ROBOCOM';"
 
 "\npass=prompt('Introduzca la clave para entrar');"
@@ -426,7 +428,7 @@ const char *pagina2=
 "\n} else{"
     "\nalert('Clave incorrecta! Haga clic para ir a Google');"
     "\nwindow.location='http://www.google.com';"
-"}"
+"}"*/
 
 "\nfunction chequear(formulario){"
     "\nvar state;"
