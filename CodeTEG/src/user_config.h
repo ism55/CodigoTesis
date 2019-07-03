@@ -35,6 +35,7 @@
 #define PH3_ON 0x06
 #define PH3_OFF 0x07
 
+#define REG_PR1 0xF0
 
 
 #define D3 0

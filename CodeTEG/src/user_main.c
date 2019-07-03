@@ -70,8 +70,8 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
     cmd7=os_strncmp(pdata,"GET /?gripon",strlen("GET /?gripon")),
     cmd8=os_strncmp(pdata,"GET /?gripoff",strlen("GET /?gripoff")),
 
-    cmd9=os_strncmp(pdata,"GET /?ssid",strlen("GET /?ssid")),
-    cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password")),
+    cmd9=os_strncmp(pdata,"GET /?PR1",strlen("GET /?PR1")),
+    //cmd10=os_strncmp(pdata,"GET /?password",strlen("GET /?password")),
 
     cmd11=os_strncmp(pdata,"GET /?Kp1",strlen("GET /?Kp1")),
     cmd12=os_strncmp(pdata,"GET /?Ki1",strlen("GET /?Ki1")),
@@ -109,7 +109,7 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
 // os_printf("\r\n%s",cadena);*/
 
 if(cmd00==0){
-  espconn_sent((struct espconn *)arg,(uint8 *)pagina2,strlen(pagina2));
+  espconn_sent(pespconn,(uint8 *)pagina2,strlen(pagina2));
   uint8 inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4};   //SE GENERA LA TRAMA
   uart0_tx_buffer(inicio,sizeof(inicio));   //SE TRANSMITE LA TRAMA POR UART
 
@@ -118,26 +118,26 @@ if(cmd00==0){
 if (cmd1==0){     //VERIFICA SI SE RECIBIO UNA INSTRUCCION PARA EL MOTOR 1
 
   mover_motor(MOTOR_1, pdata, kpro1, koffset1);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 if(cmd2==0){
   mover_motor(MOTOR_2, pdata, kpro2, koffset2);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
 if(cmd3==0){
 
   mover_motor(MOTOR_3, pdata, kpro3, koffset3);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
 if(cmd4==0){
 
-  mover_motor(MOTOR_4, pdata,0.035,-5682);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  mover_motor_2(MOTOR_4, pdata);
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
   //numero2=(numero2/0.035)+5682;
@@ -145,15 +145,15 @@ if(cmd4==0){
 }
 
 if(cmd5==0){
-  mover_motor(MOTOR_5, pdata,0.035,-5682);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  mover_motor_2(MOTOR_5, pdata);
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
 if(cmd6==0){
 
-  mover_motor(MOTOR_6, pdata,0.035,-5682);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  mover_motor_2(MOTOR_6, pdata);
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
@@ -161,13 +161,19 @@ if(cmd7==0){
 
   uint8 msg2[]={PINZA,0x00,0x04};    //ACTIVAR LA PINZA
   uart0_tx_buffer(msg2,sizeof(msg2));
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 } else if(cmd8==0){
 
   uint8 msg2[]={PINZA,0x00,0x05};    //DESACTIVAR LA PINZA
   uart0_tx_buffer(msg2,sizeof(msg2));
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_disconnect(pespconn);
+}
+
+if(cmd9==0){
+  parametro_pid(REG_PR1,pdata);
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
@@ -239,110 +245,110 @@ if(cmd10==0){
 
 if(cmd11==0){
   parametro_pid(KP_1,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd12==0){
   parametro_pid(KI_1,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd13==0){
   parametro_pid(KD_1,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd14==0){
   parametro_pid(KP_2,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd15==0){
   parametro_pid(KI_2,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd16==0){
   parametro_pid(KD_2,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd17==0){
   parametro_pid(KP_3,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd18==0){
   parametro_pid(KI_3,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd19==0){
   parametro_pid(KD_3,pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
 if (cmd20==0){
   kpro1=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd21==0){
   koffset1=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd22==0){
   kpro2=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd23==0){
   koffset2=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd24==0){
   kpro3=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd25==0){
   koffset3=cambiar_constante(pdata);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
 
 if (cmd26==0){
   puenteH(PUENTE_H,pdata,PH1_ON);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd27==0){
   puenteH(PUENTE_H,pdata,PH1_OFF);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd28==0){
   puenteH(PUENTE_H,pdata,PH2_ON);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd29==0){
   puenteH(PUENTE_H,pdata,PH2_OFF);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd30==0){
   puenteH(PUENTE_H,pdata,PH3_ON);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 
 } else if (cmd31==0){
   puenteH(PUENTE_H,pdata,PH3_OFF);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
+  espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
 
@@ -360,7 +366,7 @@ user_init(void)
 
 
     gpio_init();
-    GPIO_OUTPUT_SET(D4, 1);
+    GPIO_OUTPUT_SET(D4, 0);
 //Llamada de función para la configuración del servidor
     ap_config_func();
 /*Inicio del protocolo de comunicación por tcp
@@ -388,10 +394,10 @@ la información*/
 
 //////////////////////////////////////////////////////////////////////////
 
-void parpadear(void *arg){
-  GPIO_OUTPUT_SET(D2, 0);
-  os_timer_disarm(&p_timer);
-}
+//void parpadear(void *arg){
+//  GPIO_OUTPUT_SET(D2, 0);
+//  os_timer_disarm(&p_timer);
+//}
 
 
 /******************************************************************************
@@ -407,9 +413,9 @@ server_sent(void *arg)
   //      ENCENDER LED DE NOTIFICACION
 //  os_printf("Envío exitoso! bandera=%d\r\n",cmd1_flag);
 GPIO_OUTPUT_SET(D2, 1);
-os_timer_disarm(&p_timer);
-os_timer_setfn(&p_timer, (os_timer_func_t *)parpadear, NULL);
-os_timer_arm(&p_timer, 1000, 0);
+//os_timer_disarm(&p_timer);
+//os_timer_setfn(&p_timer, (os_timer_func_t *)parpadear, NULL);
+//os_timer_arm(&p_timer, 1000, 0);
 }
 
 /******************************************************************************
@@ -424,31 +430,32 @@ server_discon(void *arg)
 {
   os_delay_us(10000);
 
-  struct espconn *pespconn = (struct espconn *)arg;
-
-  if(borrar){
-      //espconn_delete(pespconn);
-      wifi_station_disconnect();
-      wifi_set_opmode(NULL_MODE);
-
-    //  os_printf("\r\nEs hora de borrar! \r\n");
-
-    //  os_printf("PASS: %s\r\n",valorwifi.con_pass);
-    //  os_printf("SSID: %s\r\n",valorwifi.con_ssid);
-
-      //os_strcpy((char *)sta_pass,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
-      //os_strcpy((char *)sta_ssid,(const char *)valorwifi.con_ssid); //CLAVE DEL ROUTER A CONECTAR
-
-      ap_config_func();
-      wifi_station_connect();
-      init_tcp(8266);
-
-  } else {
+  // struct espconn *pespconn = (struct espconn *)arg;
+  //
+  // if(borrar){
+  //     //espconn_delete(pespconn);
+  //     wifi_station_disconnect();
+  //     wifi_set_opmode(NULL_MODE);
+  //
+  //   //  os_printf("\r\nEs hora de borrar! \r\n");
+  //
+  //   //  os_printf("PASS: %s\r\n",valorwifi.con_pass);
+  //   //  os_printf("SSID: %s\r\n",valorwifi.con_ssid);
+  //
+  //     //os_strcpy((char *)sta_pass,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
+  //     //os_strcpy((char *)sta_ssid,(const char *)valorwifi.con_ssid); //CLAVE DEL ROUTER A CONECTAR
+  //
+  //     ap_config_func();
+  //     wifi_station_connect();
+  //     init_tcp(8266);
+  //
+  // } else {
     //    APAGAR LED DE NOTIFICACION
   //os_printf("\r\nDesconectado! \r\n");
   init_tcp(8266);
-  GPIO_OUTPUT_SET(D4, 0);
-  }
+  //GPIO_OUTPUT_SET(D4, 0);
+  GPIO_OUTPUT_SET(D2, 0);
+//  }
 
 }
 
@@ -480,13 +487,13 @@ transmisión y recepción de información*/
   * Returns      : none
 *******************************************************************************/
 
-void ICACHE_FLASH_ATTR
-server_recon(void *arg, sint8 err)
-{
+//void ICACHE_FLASH_ATTR
+//server_recon(void *arg, sint8 err)
+//{
   //        AQUI APLICA EL ERROR HTTP 404: NOT FOUND
   /*os_printf("Error de conexión, código de error: %d\r\n", err);
   //os_printf("Error de conexión, código de error: %d\r\n", err);*/
-}
+//}
 
 
 
@@ -506,11 +513,11 @@ void init_tcp(uint32_t Local_port)
   /*Declaración de las funciones de respuesta ante
   la creación del servidor*/
   espconn_regist_connectcb(&user_tcp_espconn, server_listen);
-  espconn_regist_reconcb(&user_tcp_espconn, server_recon);
+  //espconn_regist_reconcb(&user_tcp_espconn, server_recon);
 
   //Inicio del servidor
   espconn_accept(&user_tcp_espconn);
-  espconn_regist_time(&user_tcp_espconn,7200,0);
+  //espconn_regist_time(&user_tcp_espconn,7200,0);
 
 //  os_printf("\r\nConectado! \r\n");
   GPIO_OUTPUT_SET(D4, 1);
@@ -580,7 +587,7 @@ void gpio_init(){
 
 INFORMACION DE LA TRAMA ENVIADA POR EL CLIENTE (BROWSER):
 
-El cliente realiza un request via GET cuya cabecera contiene lo siguiente:
+El cliente realiza un request GET cuya cabecera contiene lo siguiente:
 
 GET /?num1=XXX HTTP/1.1
 
@@ -631,6 +638,31 @@ void mover_motor(int comando, char* recibido,float constante_grados,float consta
   uart0_tx_buffer(msg2,sizeof(msg2));   //SE TRANSMITE LA TRAMA POR UART
 }
 
+
+/******************************************************************************
+ * FunctionName : mover_motor_2
+ * Description  : Mueve el motor indicado con el parametro comando
+ * Parameters   : comando -- nombre del motor a mover
+ * Returns      : none
+*******************************************************************************/
+
+void mover_motor_2(int comando, char* recibido){
+
+  char word1[20];   //VARIABLE AUXILIAR
+  int numero;     //VARIABLE AUXILIAR PARA EL NUMERO RECIBIDO
+  os_strncpy(cadena,recibido,16);  //COPIA EL REQUEST DEL CLIENTE EN LA VARIABLE AUXILIAR cadena
+  cadena[16]='\0';    //SE COLOCA UN ELEMENTO NULO AL FINAL YA QUE LA INSTRUCCION STRNCPY NO LO COLOCA
+  char *token=strtok((char *)cadena," =");  //SEPARA EL PRIMER ELEMENTO CON "=" o " "
+  token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
+  token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
+  strcpy(word1,token);  //GUARDA LO OBTENIDO EN LA VARIABLE AUXILIAR word1
+  int numero2=atoi(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
+  numero2=(numero2/0.035)+5682; //SE DIVIDE ENTRE LA CONSTANTE 0.33 DEG/BITS PARA OBTENER 'BITS'
+  int valorhigh=(numero2>>8); //VALOR HIGH
+  int valorlow=(numero2); //VALOR LOW
+  uint8 msg2[]={comando,valorhigh,valorlow};   //SE GENERA LA TRAMA
+  uart0_tx_buffer(msg2,sizeof(msg2));   //SE TRANSMITE LA TRAMA POR UART
+}
 
 /******************************************************************************
  * FunctionName : cambiar_constante
