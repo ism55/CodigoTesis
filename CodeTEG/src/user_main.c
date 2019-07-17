@@ -3,6 +3,8 @@
 
 static bool borrar=false;
 
+int conex,desconex;
+
 struct con_wifi {
   char con_ssid[32];
   char con_pass[64];
@@ -110,7 +112,7 @@ int cmd00=os_strncmp(pdata,"GET / HTTP/1.1",strlen("GET / HTTP/1.1")),
 
 if(cmd00==0){
   espconn_sent(pespconn,(uint8 *)pagina2,strlen(pagina2));
-  uint8 inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4};   //SE GENERA LA TRAMA
+  uint8 inicio[]={0xF1,0x00,0xC0,0xF2,0x0B,0xC0,0xF3,0xF4,0x40,0xF4,0x0E,0xCC,0xF5,0x0E,0xCC,0xF6,0x0E,0xCC,0xF1,0x00,0x00,0xF2,0x18,0x40,0xF3,0xDE,0x00,0xF4,0x16,0x32,0xF5,0x16,0x32,0xF6,0x16,0x32,0xF0,0x01,0xF4,0xF8,0x13,0x88,0xFB,0x00,0x0A};   //SE GENERA LA TRAMA
   uart0_tx_buffer(inicio,sizeof(inicio));   //SE TRANSMITE LA TRAMA POR UART
 
 }
@@ -428,28 +430,13 @@ GPIO_OUTPUT_SET(D2, 1);
 void ICACHE_FLASH_ATTR
 server_discon(void *arg)
 {
-  os_delay_us(10000);
-
-  // struct espconn *pespconn = (struct espconn *)arg;
+  //os_delay_us(10000);
+    //desconex++;
+    //os_printf("\r\nDesconectado %d veces \r\n",desconex);
+   struct espconn *pespconn = (struct espconn *)arg;
   //
   // if(borrar){
-  //     //espconn_delete(pespconn);
-  //     wifi_station_disconnect();
-  //     wifi_set_opmode(NULL_MODE);
-  //
-  //   //  os_printf("\r\nEs hora de borrar! \r\n");
-  //
-  //   //  os_printf("PASS: %s\r\n",valorwifi.con_pass);
-  //   //  os_printf("SSID: %s\r\n",valorwifi.con_ssid);
-  //
-  //     //os_strcpy((char *)sta_pass,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
-  //     //os_strcpy((char *)sta_ssid,(const char *)valorwifi.con_ssid); //CLAVE DEL ROUTER A CONECTAR
-  //
-  //     ap_config_func();
-  //     wifi_station_connect();
-  //     init_tcp(8266);
-  //
-  // } else {
+          espconn_delete(pespconn);
     //    APAGAR LED DE NOTIFICACION
   //os_printf("\r\nDesconectado! \r\n");
   init_tcp(8266);
@@ -487,13 +474,14 @@ transmisión y recepción de información*/
   * Returns      : none
 *******************************************************************************/
 
-//void ICACHE_FLASH_ATTR
-//server_recon(void *arg, sint8 err)
-//{
-  //        AQUI APLICA EL ERROR HTTP 404: NOT FOUND
-  /*os_printf("Error de conexión, código de error: %d\r\n", err);
-  //os_printf("Error de conexión, código de error: %d\r\n", err);*/
-//}
+void ICACHE_FLASH_ATTR
+server_recon(void *arg, sint8 err)
+{
+//        AQUI APLICA EL ERROR HTTP 404: NOT FOUND
+  /*os_printf("Error de conexión, código de error: %d\r\n", err);*/
+  //os_printf("Error de conexión, código de error: %d\r\n", err);
+  init_tcp(8266);
+}
 
 
 
@@ -506,6 +494,10 @@ transmisión y recepción de información*/
 
 void init_tcp(uint32_t Local_port)
 {
+
+  //conex++;
+  //os_printf("\r\nConectado %d veces \r\n",conex);
+
   user_tcp_espconn.proto.tcp = &user_tcp; //SELECCION DEL APUNTADOR A UTILIZAR, SEGUN LA ESTRUCTURA user_tcp_espconn
   user_tcp_espconn.type = ESPCONN_TCP;  //SELECCION DEL TIPO DE PROTOCOLO SEGUN LOS REGISTROS
   user_tcp_espconn.proto.tcp->local_port = Local_port;  //SELECCION DEL PUERTO PARA CONEXION DEL SERVIDOR
@@ -513,7 +505,7 @@ void init_tcp(uint32_t Local_port)
   /*Declaración de las funciones de respuesta ante
   la creación del servidor*/
   espconn_regist_connectcb(&user_tcp_espconn, server_listen);
-  //espconn_regist_reconcb(&user_tcp_espconn, server_recon);
+  espconn_regist_reconcb(&user_tcp_espconn, server_recon);
 
   //Inicio del servidor
   espconn_accept(&user_tcp_espconn);
