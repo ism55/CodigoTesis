@@ -613,7 +613,7 @@ float cambiar_constante(char* recibido){
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   strcpy(word1,token);  //GUARDA LO OBTENIDO EN LA VARIABLE AUXILIAR word1
-  float numero2=myatof(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
+  float numero2=myatof(word1);  //CONVIERTE EL VALOR DE ASCII A FLOAT
   return numero2;
 }
 
