@@ -554,17 +554,17 @@ void mover_motor(int comando, char* recibido,float constante_grados,float consta
 
   char word1[20];   //VARIABLE AUXILIAR
   int numero;     //VARIABLE AUXILIAR PARA EL NUMERO RECIBIDO
-  os_strncpy(cadena,recibido,16);  //COPIA EL REQUEST DEL CLIENTE EN LA VARIABLE AUXILIAR cadena
-  cadena[16]='\0';    //SE COLOCA UN ELEMENTO NULO AL FINAL YA QUE LA INSTRUCCION STRNCPY NO LO COLOCA
+  os_strncpy(cadena,recibido,20);  //COPIA EL REQUEST DEL CLIENTE EN LA VARIABLE AUXILIAR cadena
+  cadena[20]='\0';    //SE COLOCA UN ELEMENTO NULO AL FINAL YA QUE LA INSTRUCCION STRNCPY NO LO COLOCA
   char *token=strtok((char *)cadena," =");  //SEPARA EL PRIMER ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   strcpy(word1,token);  //GUARDA LO OBTENIDO EN LA VARIABLE AUXILIAR word1
-  int numero2=atoi(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
+  float numero2=myatof(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
   numero2=(numero2/constante_grados)-constante_offset; //SE DIVIDE ENTRE LA CONSTANTE 0.33 DEG/BITS PARA OBTENER 'BITS'
-  numero2=numero2<<6; //INSTRUCCION BITWISE PARA ORDENAR LOS NUMERO Y GENERAR LA TRAMA
-  int valorhigh=(numero2>>8); //VALOR HIGH
-  int valorlow=(numero2); //VALOR LOW
+  numero2=(int)numero2<<6; //INSTRUCCION BITWISE PARA ORDENAR LOS NUMERO Y GENERAR LA TRAMA
+  int valorhigh=((int)numero2>>8); //VALOR HIGH
+  int valorlow=((int)numero2); //VALOR LOW
   uint8 msg2[]={comando,valorhigh,valorlow};   //SE GENERA LA TRAMA
   uart0_tx_buffer(msg2,sizeof(msg2));   //SE TRANSMITE LA TRAMA POR UART
 }
@@ -581,16 +581,16 @@ void mover_motor_2(int comando, char* recibido){
 
   char word1[20];   //VARIABLE AUXILIAR
   int numero;     //VARIABLE AUXILIAR PARA EL NUMERO RECIBIDO
-  os_strncpy(cadena,recibido,16);  //COPIA EL REQUEST DEL CLIENTE EN LA VARIABLE AUXILIAR cadena
-  cadena[16]='\0';    //SE COLOCA UN ELEMENTO NULO AL FINAL YA QUE LA INSTRUCCION STRNCPY NO LO COLOCA
+  os_strncpy(cadena,recibido,20);  //COPIA EL REQUEST DEL CLIENTE EN LA VARIABLE AUXILIAR cadena
+  cadena[20]='\0';    //SE COLOCA UN ELEMENTO NULO AL FINAL YA QUE LA INSTRUCCION STRNCPY NO LO COLOCA
   char *token=strtok((char *)cadena," =");  //SEPARA EL PRIMER ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   token=strtok(NULL," =");  //SEPARA EL SIGUIENTE ELEMENTO CON "=" o " "
   strcpy(word1,token);  //GUARDA LO OBTENIDO EN LA VARIABLE AUXILIAR word1
-  int numero2=atoi(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
-  numero2=(numero2/0.035)+5682; //SE DIVIDE ENTRE LA CONSTANTE 0.33 DEG/BITS PARA OBTENER 'BITS'
-  int valorhigh=(numero2>>8); //VALOR HIGH
-  int valorlow=(numero2); //VALOR LOW
+  float numero2=myatof(word1);  //CONVIERTE EL VALOR DE ASCII A ENTERO
+  numero2=(numero2/0.035)+5682; //SE DIVIDE ENTRE LA CONSTANTE DEG/BITS PARA OBTENER 'BITS'
+  int valorhigh=((int)numero2>>8); //VALOR HIGH
+  int valorlow=((int)numero2); //VALOR LOW
   uint8 msg2[]={comando,valorhigh,valorlow};   //SE GENERA LA TRAMA
   uart0_tx_buffer(msg2,sizeof(msg2));   //SE TRANSMITE LA TRAMA POR UART
 }
