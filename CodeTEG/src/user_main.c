@@ -1,5 +1,3 @@
-
-#include <header.h>
 #include "funciones.h"
 
 uint32 ICACHE_FLASH_ATTR
@@ -38,14 +36,13 @@ user_rf_cal_sector_set(void)
 void ICACHE_FLASH_ATTR
 user_rf_pre_init(void)
 {
+  system_set_os_print(0);
 }
 
 
 void ICACHE_FLASH_ATTR
 user_init(void)
 {
-
-    system_set_os_print(0);
     gpio_init();
     GPIO_OUTPUT_SET(D4, 0);
 //Llamada de función para la configuración del servidor

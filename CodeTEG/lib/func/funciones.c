@@ -8,7 +8,6 @@ float kpro1=0.33,
       koffset1=0,
       koffset2=39,
       koffset3=0;
-      //constante_grados=0.33;
 
 
 LOCAL struct espconn user_tcp_espconn;
@@ -161,72 +160,6 @@ if(cmd9==0){
   espconn_disconnect(pespconn);
 }
 
-/*
-if(cmd9==0){
-  char word1[32];
-  os_strncpy(cadena,pdata,30);
-  cadena[30]='\0';
-  char *token=strtok((char *)cadena," =");
-
-  //os_printf("%s\r\n",token);
-
-  token=strtok(NULL," =");
-  token=strtok(NULL," =");
-
-  strcpy(word1,token);
-  word1[32]='\0';
-  for(int i = 0; i < strlen(word1); i++){
-    if(word1[i] == '_')
-        word1[i] = ' ';
-}
-//  os_printf("%s\r\n",word1);
-
-  if (os_strcmp(word1,"null")==0){
-    strcpy(sta_ssid,"");
-    sta_ssid[32]='\0';
-  } else {
-    strcpy(sta_ssid,word1);
-    sta_ssid[32]='\0';
-  }
-
-  os_strcpy((char *)valorwifi.con_ssid,(char *)sta_ssid); //CLAVE DEL ROUTER A CONECTAR
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
-}
-
-if(cmd10==0){
-  char word1[64];
-  os_strncpy(cadena,pdata,30);
-  cadena[30]='\0';
-  char *token=strtok((char *)cadena," =");
-
-  token=strtok(NULL," =");
-  token=strtok(NULL," =");
-  strcpy(word1,token);
-  word1[20]='\0';
-  for(int i = 0; i < strlen(word1); i++){
-    if(word1[i] == '_')
-        word1[i] = ' ';
-}
-  //os_printf("%s\r\n",word1);
-
-  if (os_strcmp(word1,"null")==0){
-    strcpy(sta_pass,"");
-    sta_pass[64]='\0';
-  } else {
-    strcpy(sta_pass,word1);
-    sta_pass[64]='\0';
-  }
-
-  os_strcpy((char *)valorwifi.con_pass,(char *)sta_pass); //CLAVE DEL ROUTER A CONECTAR
-
-  //espconn_delete(pespconn);
-  espconn_sent((struct espconn *)arg,(uint8 *)respuesta1,strlen(respuesta1));
-  borrar=true;
-  espconn_disconnect(pespconn);
-}
-
-*/
-
 if(cmd11==0){
   parametro_pid(KP_1,pdata);
   espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
@@ -336,9 +269,7 @@ if (cmd26==0){
   espconn_disconnect(pespconn);
 }
 
-//if (cmd00 && cmd1 && cmd2 && cmd3 && cmd4 && cmd5 && cmd6 && cmd7 && cmd8 && cmd9 && cmd10 && cmd11 && cmd12 && cmd13 && cmd14 && cmd15 && cmd16 && cmd17 && cmd18 && cmd19 && cmd20 && cmd21 && cmd22 && cmd23 && cmd24 && cmd25 && cmd26 && cmd27 && cmd28 && cmd29 && cmd30 && cmd31) {}
-
-}
+}//End server_recv
 
 
 /******************************************************************************
@@ -352,11 +283,7 @@ void ICACHE_FLASH_ATTR
 server_sent(void *arg)
 {
   //      ENCENDER LED DE NOTIFICACION
-//  os_printf("Envío exitoso! bandera=%d\r\n",cmd1_flag);
-GPIO_OUTPUT_SET(D2, 1);
-//os_timer_disarm(&p_timer);
-//os_timer_setfn(&p_timer, (os_timer_func_t *)parpadear, NULL);
-//os_timer_arm(&p_timer, 1000, 0);
+  GPIO_OUTPUT_SET(D2, 1);
 }
 
 /******************************************************************************
@@ -369,20 +296,11 @@ GPIO_OUTPUT_SET(D2, 1);
 void ICACHE_FLASH_ATTR
 server_discon(void *arg)
 {
-  //os_delay_us(10000);
-    //desconex++;
-    //os_printf("\r\nDesconectado %d veces \r\n",desconex);
    struct espconn *pespconn = (struct espconn *)arg;
-  //
-  // if(borrar){
-          espconn_delete(pespconn);
+    espconn_delete(pespconn);
+    init_tcp(8266);
     //    APAGAR LED DE NOTIFICACION
-  //os_printf("\r\nDesconectado! \r\n");
-  init_tcp(8266);
-  //GPIO_OUTPUT_SET(D4, 0);
-  GPIO_OUTPUT_SET(D2, 0);
-//  }
-
+    GPIO_OUTPUT_SET(D2, 0);
 }
 
 
@@ -416,9 +334,6 @@ transmisión y recepción de información*/
 void ICACHE_FLASH_ATTR
 server_recon(void *arg, sint8 err)
 {
-//        AQUI APLICA EL ERROR HTTP 404: NOT FOUND
-  /*os_printf("Error de conexión, código de error: %d\r\n", err);*/
-  //os_printf("Error de conexión, código de error: %d\r\n", err);
   init_tcp(8266);
 }
 
@@ -434,9 +349,6 @@ server_recon(void *arg, sint8 err)
 void init_tcp(uint32_t Local_port)
 {
 
-  //conex++;
-  //os_printf("\r\nConectado %d veces \r\n",conex);
-
   user_tcp_espconn.proto.tcp = &user_tcp; //SELECCION DEL APUNTADOR A UTILIZAR, SEGUN LA ESTRUCTURA user_tcp_espconn
   user_tcp_espconn.type = ESPCONN_TCP;  //SELECCION DEL TIPO DE PROTOCOLO SEGUN LOS REGISTROS
   user_tcp_espconn.proto.tcp->local_port = Local_port;  //SELECCION DEL PUERTO PARA CONEXION DEL SERVIDOR
@@ -450,7 +362,6 @@ void init_tcp(uint32_t Local_port)
   espconn_accept(&user_tcp_espconn);
   //espconn_regist_time(&user_tcp_espconn,7200,0);
 
-//  os_printf("\r\nConectado! \r\n");
   GPIO_OUTPUT_SET(D4, 1);
 }
 
@@ -465,21 +376,8 @@ void ap_config_func()
 {
 
 //Modo estación+punto de acceso
-  wifi_set_opmode(SOFTAP_MODE); //MODO ESTACION + ACCESS POINT
+  wifi_set_opmode(SOFTAP_MODE); //MODO ACCESS POINT
   wifi_softap_get_config(&config);  //DECLARA LA ESTRUCTURA config PARA CONFIGURAR EL MODO AP
-/*  wifi_station_get_config(&station_cfg);  //DECLARA LA ESTRUCTURA station_cfg PARA CONFIGURAR EL MODO STATION
-
-
-  station_cfg.bssid_set=1;
-
-//Nombre y contraseña del router que se conectara
-  os_strcpy((char *)station_cfg.ssid,(const char *)valorwifi.con_ssid); //NOMBRE DEL ROUTER A CONECTAR
-  os_strcpy((char *)station_cfg.password,(const char *)valorwifi.con_pass); //CLAVE DEL ROUTER A CONECTAR
-
-  wifi_station_set_config(&station_cfg);  //CONFIGURADO EL MODO STATION
-
-  //os_printf("\r\nCONF PASS: %s\r\n",station_cfg.password);
-  //os_printf("\r\nCONF SSID: %s\r\n",station_cfg.ssid);*/
 
   os_memcpy(config.ssid, AP_SSID,strlen(AP_SSID));  //NOMBRE DEL WIFI SERVIDOR
   os_memcpy(config.password,AP_PASSWORD,strlen(AP_PASSWORD)); //CLAVE DEL WIFI SERVIDOR
