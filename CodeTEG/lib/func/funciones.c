@@ -268,7 +268,7 @@ if (cmd26==0){
   espconn_sent(pespconn,(uint8 *)respuesta1,strlen(respuesta1));
   espconn_disconnect(pespconn);
 }
-
+GPIO_OUTPUT_SET(D2, 1);
 }//End server_recv
 
 
