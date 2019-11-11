@@ -568,12 +568,27 @@ float myatof(char *p) {
   // here i took another two   variables for counting the number of digits in mantissa
   int i, num = 0, num2 = 0, pnt_seen = 0, x = 0, y = 1;
   float f1, f2, f3;
-  for (i = 0; p[i]; i++)
+  int signo=0;
+
+  if(p[0]=='-'){
+        signo=1;
+      //  printf("hola");
+
+    }
+
+
+  for (i = 0+signo; p[i]; i++){
+//    if(p[0]='-'){i++; signo=1;}
     if (p[i] == '.') {
       pnt_seen = i;
       break;
     }
-  for (i = 0; p[i]; i++) {
+}
+
+
+
+  for (i = 0+signo; p[i]; i++) {
+
     if (i < pnt_seen) num = num * 10 + (p[i] - 48);
     else if (i == pnt_seen) continue;
     else {
@@ -582,9 +597,11 @@ float myatof(char *p) {
     }
   }
   // it takes 10 if it has 1 digit ,100 if it has 2 digits in mantissa
-  for (i = 1; i <= x; i++)
+
+  for (i = 1+signo; i <= x; i++)
     y = y * 10;
   f2 = num2 / (float) y;
   f3 = num + f2;
+  if(signo==1){f3=f3*(-1);}
   return f3;
 }

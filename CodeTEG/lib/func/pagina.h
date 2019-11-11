@@ -369,7 +369,11 @@ const char *pagina2=
 
 
     "\nfunction mover(pos, nombre) {"
-    "\n$.get('?' + nombre + '=' + pos);"
+    "\nif(isNaN(pos)){\n$.get('?' + nombre + '=' + pos);"
+    "}else{"
+    "\n$.get('?' + nombre + '=' + pos + '.00');"
+    "}"
+
     //setTimeout(function () {$.get('?' + nombre + '=' + pos); }, 10);
     //{Connection:close};
 /*    //"\nvar URL = '?' + nombre + '=' + pos;"
@@ -438,9 +442,9 @@ const char *pagina2=
 "\nswitch (item0) {"
                 "\ncase 'q1':"
                     "\nif(item1>135){"
-                      "\nmover(135,'num1');"
+                      "\nmover(135.00,'num1');"
                     "\n}else if(item1<-135){"
-                      "\nmover(-135,'num1');"
+                      "\nmover(-135.00,'num1');"
                     "\n}else{"
                       "\nmover(item1,'num1');"
                     "\n}"
@@ -450,9 +454,9 @@ const char *pagina2=
                 "\ncase 'q2':"
 
                 "\nif(item1>135){"
-                  "\nmover(135,'num2');"
+                  "\nmover(135.00,'num2');"
                 "\n}else if(item1<-135){"
-                  "\nmover(-135,'num2');"
+                  "\nmover(-135.00,'num2');"
                 "\n}else{"
                   "\nmover(item1,'num2');"
                 "\n}"
@@ -461,9 +465,9 @@ const char *pagina2=
                 "\ncase 'q3':"
 
                 "\nif(item1>135){"
-                  "\nmover(135,'num3');"
+                  "\nmover(135.00,'num3');"
                 "\n}else if(item1<-135){"
-                  "\nmover(-135,'num3');"
+                  "\nmover(-135.00,'num3');"
                 "\n}else{"
                   "\nmover(item1,'num3');"
                 "\n}"
@@ -474,7 +478,7 @@ const char *pagina2=
                   "\nif(item1>60){"
                     "\nmover(60,'num4');"
                   "\n}else if(item1<-60){"
-                    "\nmover(-60,'num4');"
+                    "\nmover(-60.00,'num4');"
                   "\n}else{"
                     "\nmover(item1,'num4');"
                   "\n}"
@@ -485,7 +489,7 @@ const char *pagina2=
                   "\nif(item1>60){"
                     "\nmover(60,'num5');"
                   "\n}else if(item1<-60){"
-                    "\nmover(-60,'num5');"
+                    "\nmover(-60.00,'num5');"
                   "\n}else{"
                     "\nmover(item1,'num5');"
                   "\n}"
@@ -493,9 +497,9 @@ const char *pagina2=
 
                 "\ncase 'q6':"
                   "\nif(item1>60){"
-                    "\nmover(60,'num6');"
+                    "\nmover(60.00,'num6');"
                   "\n}else if(item1<-60){"
-                    "\nmover(-60,'num6');"
+                    "\nmover(-60.00,'num6');"
                   "\n}else{"
                     "\nmover(item1,'num6');"
                   "\n}"
